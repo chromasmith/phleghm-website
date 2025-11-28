@@ -1,7 +1,7 @@
 const socialLinks = [
   { name: 'TikTok', href: 'https://www.tiktok.com/@phlegmssg', icon: TikTokIcon, primary: true },
   { name: 'YouTube', href: 'https://www.youtube.com/@PHLEGMO', icon: YouTubeIcon, primary: false },
-  { name: 'Instagram', href: 'https://www.instagram.com/phlegm425', icon: InstagramIcon, primary: false },
+  { name: 'Instagram', href: 'https://www.instagram.com/phlegmssg/', icon: InstagramIcon, primary: false },
   { name: 'Spotify', href: 'https://open.spotify.com/artist/3brB4yhi4ZJtxQkbZX0wkk', icon: SpotifyIcon, primary: false },
   { name: 'SoundCloud', href: 'https://soundcloud.com/phlegmo', icon: SoundCloudIcon, primary: false },
 ];
