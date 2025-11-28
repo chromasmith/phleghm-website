@@ -1,0 +1,109 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run TypeScript check
+        id: typescript
+        continue-on-error: true
+        run: |
+          npx tsc --noEmit 2>&1 | tee typescript-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Run ESLint
+        id: eslint
+        continue-on-error: true
+        run: |
+          npx eslint . --max-warnings 100 2>&1 | tee eslint-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Check results and notify
+        if: always()
+        run: |
+          TS_RESULT="${{ steps.typescript.outcome }}"
+          ESLINT_RESULT="${{ steps.eslint.outcome }}"
+          
+          if [ "$TS_RESULT" == "failure" ]; then
+            echo "FAILED_STEP=TypeScript" >> $GITHUB_ENV
+            ERROR_COUNT=$(grep -c "error TS" typescript-output.txt 2>/dev/null || echo "0")
+            echo "ERROR_COUNT=$ERROR_COUNT errors" >> $GITHUB_ENV
+          elif [ "$ESLINT_RESULT" == "failure" ]; then
+            echo "FAILED_STEP=ESLint" >> $GITHUB_ENV
+            ERROR_INFO=$(tail -1 eslint-output.txt | grep -oE '[0-9]+ errors?.*[0-9]+ warnings?' || echo "check logs")
+            echo "ERROR_COUNT=$ERROR_INFO" >> $GITHUB_ENV
+          else
+            echo "FAILED_STEP=none" >> $GITHUB_ENV
+            echo "ERROR_COUNT=0" >> $GITHUB_ENV
+          fi
+
+      - name: Notify Slack on failure
+        if: always() && (steps.typescript.outcome == 'failure' || steps.eslint.outcome == 'failure')
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "❌ Quality Gate Failed on ${{ github.repository }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ *Quality Gate Failed*\n\n*Repo:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* `${{ github.sha }}`\n*Failed:* ${{ env.FAILED_STEP }} (${{ env.ERROR_COUNT }})"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Full Logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Slack on success
+        if: success() && steps.typescript.outcome == 'success' && steps.eslint.outcome == 'success' && github.event_name == 'push'
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "✅ Quality Gate Passed on ${{ github.repository }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ *Quality Gate Passed*\n\n*Repo:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* `${{ github.sha }}`"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Fail job if checks failed
+        if: steps.typescript.outcome == 'failure' || steps.eslint.outcome == 'failure'
+        run: exit 1
