@@ -37,18 +37,33 @@ export default function HeroSection({ content }: HeroSectionProps) {
       )}
       
       <div className="relative z-10 text-center px-4">
-        <h1 className="font-headline text-7xl md:text-9xl font-black text-white"
+        {/* Distressed title with noise texture overlay */}
+        <div className="relative inline-block">
+          <h1 className="font-headline text-7xl md:text-9xl font-black text-white tracking-wide"
+              style={{
+                textShadow: '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)',
+                letterSpacing: '0.05em',
+                WebkitTextStroke: '1px rgba(255,255,255,0.1)',
+              }}>
+            PHLEGM
+          </h1>
+          {/* Distress noise overlay on text */}
+          <div 
+            className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40"
             style={{
-              textShadow: '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)'
-            }}>
-          PHLEGHM<span className="text-[#00ff41]">™</span>
-        </h1>
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            }}
+          />
+        </div>
+        
         <p className="font-body mt-6 text-zinc-500 tracking-[0.3em] uppercase text-sm">
           {tagline}
         </p>
         
         <a
-          href="#"
+          href="https://www.tiktok.com/@phlegmssg"
+          target="_blank"
+          rel="noopener noreferrer"
           className="font-headline inline-flex items-center gap-3 mt-12 px-8 py-4 bg-[#00ff41] text-black font-bold text-sm tracking-wider uppercase hover:bg-white transition-all duration-300"
         >
           <TikTokIcon className="w-5 h-5" />
