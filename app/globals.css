@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --neon-green: #00ff41;
+  --spotify-green: #1DB954;
+  --red-glitch: #ff0040;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
