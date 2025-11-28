@@ -11,4 +11,16 @@
 body {
   background-color: #000000;
   color: #ffffff;
+  font-family: 'Courier New', monospace;
+}
+
+/* Headline font class */
+.font-headline {
+  font-family: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
+  letter-spacing: -0.05em;
+}
+
+/* Body/label font class */
+.font-body {
+  font-family: 'Courier New', monospace;
 }
