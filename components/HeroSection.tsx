@@ -126,4 +126,226 @@ export default function HeroSection({ content }: HeroSectionProps) {
     return {
       ...randomTransform,
       color: Math.random() > 0.6 ? '#00ff41' : '#ff0040',
-      textShadow: '
+      textShadow: '0 0 8px currentColor',
+    };
+  };
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Desktop video (horizontal) */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover hidden md:block"
+      >
+        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_H.mp4" type="video/mp4" />
+      </video>
+      
+      {/* Mobile video (vertical) */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover md:hidden"
+      >
+        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4" type="video/mp4" />
+      </video>
+      
+      {/* Scanlines overlay - on video, behind content */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          zIndex: 1,
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)',
+          opacity: 0.5,
+        }}
+      />
+      
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50" style={{ zIndex: 2 }} />
+      
+      {/* Content */}
+      <div className="relative text-center px-4" style={{ zIndex: 10 }}>
+        
+        {/* Title container with distress effects */}
+        <div className="relative inline-block mb-6">
+          
+          {/* Title with per-letter jitter */}
+          <h1 className="relative select-none">
+            {titleLetters.map((letter, i) => (
+              <span
+                key={i}
+                className="inline-block transition-all duration-75"
+                style={{
+                  fontFamily: "'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif",
+                  fontSize: 'clamp(4rem, 15vw, 10rem)',
+                  fontWeight: 900,
+                  letterSpacing: '0.02em',
+                  color: titleGlitch ? '#ff0040' : '#ffffff',
+                  textShadow: titleGlitch 
+                    ? '-3px 0 #00ff41, 3px 0 #ff0040, 0 0 20px rgba(255,0,64,0.5)' 
+                    : '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)',
+                  ...(titleGlitch ? { transform: 'translateX(2px)' } : {}),
+                  ...getJitterStyle(i),
+                }}
+              >
+                {letter}
+              </span>
+            ))}
+          </h1>
+          
+          {/* Black distress marks ON TOP of text */}
+          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 20 }}>
+            {/* Spray splatter cluster 1 - on the P */}
+            <div 
+              className="absolute"
+              style={{
+                left: '8%',
+                top: '35%',
+                width: '6px',
+                height: '6px',
+                background: '#000',
+                borderRadius: '50%',
+                boxShadow: '2px 3px 0 1px #000, -1px 5px 0 0px #000, 3px -1px 0 0px #000',
+              }}
+            />
+            
+            {/* Spray splatter cluster 2 - between H and L */}
+            <div 
+              className="absolute"
+              style={{
+                left: '28%',
+                top: '25%',
+                width: '4px',
+                height: '4px',
+                background: '#000',
+                borderRadius: '50%',
+                boxShadow: '1px 2px 0 0px #000, -2px 1px 0 1px #000',
+              }}
+            />
+            
+            {/* Spray drip on E */}
+            <div 
+              className="absolute"
+              style={{
+                left: '52%',
+                top: '45%',
+                width: '3px',
+                height: '18px',
+                background: 'linear-gradient(180deg, #000 60%, transparent)',
+                borderRadius: '50% 50% 50% 50% / 10% 10% 90% 90%',
+              }}
+            />
+            
+            {/* Small speckles */}
+            <div className="absolute" style={{ left: '18%', top: '55%', width: '2px', height: '2px', background: '#000', borderRadius: '50%' }} />
+            <div className="absolute" style={{ left: '72%', top: '30%', width: '3px', height: '3px', background: '#000', borderRadius: '50%' }} />
+            <div 
+              className="absolute"
+              style={{
+                left: '85%',
+                top: '50%',
+                width: '2px',
+                height: '2px',
+                background: '#000',
+                borderRadius: '50%',
+                boxShadow: '-2px 3px 0 0px #000, 1px -2px 0 0px #000',
+              }}
+            />
+            
+            {/* Scratch on G */}
+            <div 
+              className="absolute"
+              style={{
+                left: '68%',
+                top: '40%',
+                width: '12px',
+                height: '2px',
+                background: '#000',
+                transform: 'rotate(-25deg)',
+                opacity: 0.7,
+              }}
+            />
+            
+            {/* Paint fleck near M */}
+            <div 
+              className="absolute"
+              style={{
+                right: '5%',
+                top: '35%',
+                width: '5px',
+                height: '7px',
+                background: '#000',
+                borderRadius: '40% 60% 30% 70%',
+                transform: 'rotate(15deg)',
+              }}
+            />
+            
+            {/* Tiny scattered dots */}
+            <div 
+              className="absolute"
+              style={{
+                left: '40%',
+                top: '20%',
+                width: '1px',
+                height: '1px',
+                background: '#000',
+                boxShadow: '5px 8px 0 #000, -3px 15px 0 #000, 8px 20px 0 #000',
+              }}
+            />
+          </div>
+        </div>
+        
+        {/* Typewriter tagline - using pre to preserve whitespace */}
+        <div className="h-10 flex items-center justify-center">
+          <p 
+            className={`font-body text-lg md:text-xl font-bold tracking-wider transition-all duration-75 whitespace-pre ${
+              isGlitchingOut ? 'opacity-50' : 'opacity-100'
+            }`}
+            style={{
+              color: isGlitchingOut ? '#ff0040' : '#a1a1aa',
+              textShadow: isGlitchingOut ? '-2px 0 #00ff41, 2px 0 #ff0040' : 'none',
+              transform: isGlitchingOut ? 'translateX(2px)' : 'none',
+            }}
+          >
+            {displayedText}
+            {phase === 'typing' && displayedText.length < currentTagline.length && (
+              <span 
+                className="inline-block w-2 h-5 ml-0.5 animate-pulse align-middle"
+                style={{ backgroundColor: '#00ff41' }}
+              />
+            )}
+          </p>
+        </div>
+        
+        {/* TikTok button */}
+        <a
+          href="https://www.tiktok.com/@phlegmssg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-headline inline-flex items-center gap-4 mt-12 px-10 py-4 bg-[#00ff41] text-black font-bold text-sm uppercase hover:bg-white transition-all duration-300"
+          style={{ letterSpacing: '0.15em' }}
+        >
+          <TikTokIcon className="w-5 h-5" />
+          Watch on TikTok
+        </a>
+      </div>
+      
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" style={{ zIndex: 10 }}>
+        <div className="w-px h-16 bg-gradient-to-b from-transparent via-[#00ff41] to-transparent opacity-50" />
+      </div>
+    </section>
+  );
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+    </svg>
+  );
+}
