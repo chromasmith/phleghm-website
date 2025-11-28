@@ -11,7 +11,19 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-950 via-black to-black">
-      {/* Background video placeholder - will use content.video_url when available */}
+      {/* Background gradient effects */}
+      <div className="absolute inset-0 opacity-40"
+           style={{
+             backgroundImage: 'radial-gradient(ellipse at 30% 20%, #1a1a1a 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, #0d0d0d 0%, transparent 50%)'
+           }} />
+      
+      {/* Animated fog effect */}
+      <div className="absolute inset-0 opacity-20 animate-pulse"
+           style={{
+             background: 'linear-gradient(135deg, transparent 30%, rgba(0,255,65,0.05) 50%, transparent 70%)'
+           }} />
+      
+      {/* Background video - will use content.video_url when available */}
       {content?.video_url && (
         <video
           autoPlay
@@ -25,16 +37,19 @@ export default function HeroSection({ content }: HeroSectionProps) {
       )}
       
       <div className="relative z-10 text-center px-4">
-        <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-white">
+        <h1 className="font-headline text-7xl md:text-9xl font-black text-white"
+            style={{
+              textShadow: '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)'
+            }}>
           PHLEGHM<span className="text-[#00ff41]">™</span>
         </h1>
-        <p className="mt-4 text-zinc-500 tracking-[0.3em] uppercase text-sm md:text-base">
+        <p className="font-body mt-6 text-zinc-500 tracking-[0.3em] uppercase text-sm">
           {tagline}
         </p>
         
         <a
           href="#"
-          className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-[#00ff41] text-black font-bold uppercase tracking-wide hover:bg-[#00cc33] transition-colors"
+          className="font-headline inline-flex items-center gap-3 mt-12 px-8 py-4 bg-[#00ff41] text-black font-bold text-sm tracking-wider uppercase hover:bg-white transition-all duration-300"
         >
           <TikTokIcon className="w-5 h-5" />
           Watch on TikTok
@@ -43,7 +58,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
       
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-px h-12 bg-gradient-to-b from-zinc-500 to-transparent" />
+        <div className="w-px h-16 bg-gradient-to-b from-transparent via-[#00ff41] to-transparent opacity-50" />
       </div>
     </section>
   );
