@@ -10,11 +10,11 @@ interface PastShowsProps {
 export default function PastShows({ shows }: PastShowsProps) {
   return (
     <section className="py-16 px-4 bg-zinc-950">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl font-black tracking-tight mb-8 text-center">
           Past Shows
         </h2>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {shows.map((show) => (
             <PastShowCard key={show.id} show={show} />
           ))}
@@ -49,74 +49,80 @@ function PastShowCard({ show }: { show: PastShow }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-6 border border-zinc-800 bg-zinc-900/30">
-      {/* Image Carousel */}
-      <div className="relative w-full md:w-96 h-64 bg-zinc-800 flex-shrink-0">
-        {hasImages ? (
-          <>
-            <img
-              src={show.image_urls[currentImageIndex]}
-              alt={`${show.venue} - ${show.show_date}`}
-              className="w-full h-full object-cover"
+    <div className="relative w-full h-80 md:h-96 overflow-hidden group">
+      {/* Full-bleed background image */}
+      {hasImages ? (
+        <img
+          src={show.image_urls[currentImageIndex]}
+          alt={`${show.venue} - ${show.show_date}`}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-zinc-800" />
+      )}
+      
+      {/* Dark gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+      
+      {/* Navigation arrows - only show if multiple images */}
+      {hasMultipleImages && (
+        <>
+          <button
+            onClick={prevImage}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors z-10"
+          >
+            <ChevronLeftIcon className="w-6 h-6" />
+          </button>
+          <button
+            onClick={nextImage}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors z-10"
+          >
+            <ChevronRightIcon className="w-6 h-6" />
+          </button>
+        </>
+      )}
+      
+      {/* Image counter - top right */}
+      {hasMultipleImages && (
+        <div className="absolute top-4 right-4 px-2 py-1 bg-black/60 text-xs z-10">
+          {currentImageIndex + 1} / {show.image_urls.length}
+        </div>
+      )}
+      
+      {/* Dot indicators - bottom center */}
+      {hasMultipleImages && (
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {show.image_urls.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentImageIndex(i)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                i === currentImageIndex ? 'bg-[#00ff41]' : 'bg-white/40 hover:bg-white/60'
+              }`}
             />
-            {hasMultipleImages && (
-              <>
-                {/* Navigation arrows */}
-                <button
-                  onClick={prevImage}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-                >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-                >
-                  <ChevronRightIcon className="w-5 h-5" />
-                </button>
-                {/* Image counter */}
-                <div className="absolute top-2 right-2 px-2 py-1 bg-black/60 text-xs">
-                  {currentImageIndex + 1} / {show.image_urls.length}
-                </div>
-                {/* Dot indicators */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                  {show.image_urls.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentImageIndex(i)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        i === currentImageIndex ? 'bg-[#00ff41]' : 'bg-white/40'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-zinc-600">
-            No photos yet
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col justify-center">
-        {show.event_name && (
-          <span className="inline-block self-start px-2 py-1 border border-[#00ff41] text-[#00ff41] text-xs uppercase tracking-wider mb-2">
-            {show.event_name}
-          </span>
-        )}
-        <p className="text-[#00ff41] tracking-widest text-sm mb-1">
-          {formattedDate}
-        </p>
-        <h3 className="text-2xl font-bold hover:text-[#00ff41] transition-colors">
-          {show.venue}
-        </h3>
-        <p className="text-zinc-500 flex items-center gap-1 mt-1">
-          <LocationIcon className="w-4 h-4" />
-          {show.city}
-        </p>
+          ))}
+        </div>
+      )}
+      
+      {/* Text overlay - bottom left */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+        <div className="max-w-2xl">
+          {show.event_name && (
+            <span className="inline-block px-3 py-1 border border-[#00ff41] text-[#00ff41] text-xs uppercase tracking-wider mb-3">
+              {show.event_name}
+            </span>
+          )}
+          <p className="text-[#00ff41] tracking-widest text-sm mb-1">
+            {formattedDate}
+          </p>
+          <h3 className="text-3xl md:text-4xl font-black tracking-tight">
+            {show.venue}
+          </h3>
+          <p className="text-zinc-400 flex items-center gap-1 mt-2">
+            <LocationIcon className="w-4 h-4" />
+            {show.city}
+          </p>
+        </div>
       </div>
     </div>
   );
