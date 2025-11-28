@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { HeroContent } from '@/types/database';
 
 interface HeroSectionProps {
@@ -8,55 +9,62 @@ interface HeroSectionProps {
 
 export default function HeroSection({ content }: HeroSectionProps) {
   const tagline = content?.tagline || 'Seattle Underground';
+  const [glitch, setGlitch] = useState(false);
+
+  // Glitch effect interval
+  useEffect(() => {
+    const glitchInterval = setInterval(() => {
+      setGlitch(true);
+      setTimeout(() => setGlitch(false), 150);
+    }, 4000);
+    return () => clearInterval(glitchInterval);
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-950 via-black to-black">
-      {/* Background gradient effects */}
-      <div className="absolute inset-0 opacity-40"
-           style={{
-             backgroundImage: 'radial-gradient(ellipse at 30% 20%, #1a1a1a 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, #0d0d0d 0%, transparent 50%)'
-           }} />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Desktop video (horizontal) - hidden on mobile */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover hidden md:block"
+      >
+        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_H.mp4" type="video/mp4" />
+      </video>
       
-      {/* Animated fog effect */}
-      <div className="absolute inset-0 opacity-20 animate-pulse"
-           style={{
-             background: 'linear-gradient(135deg, transparent 30%, rgba(0,255,65,0.05) 50%, transparent 70%)'
-           }} />
+      {/* Mobile video (vertical) - hidden on desktop */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover md:hidden"
+      >
+        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4" type="video/mp4" />
+      </video>
       
-      {/* Background video - will use content.video_url when available */}
-      {content?.video_url && (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        >
-          <source src={content.video_url} type="video/mp4" />
-        </video>
-      )}
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-black/50" />
       
+      {/* Content */}
       <div className="relative z-10 text-center px-4">
-        {/* Distressed title with noise texture overlay */}
-        <div className="relative inline-block">
-          <h1 className="font-headline text-7xl md:text-9xl font-black text-white tracking-wide"
-              style={{
-                textShadow: '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)',
-                letterSpacing: '0.05em',
-                WebkitTextStroke: '1px rgba(255,255,255,0.1)',
-              }}>
-            PHLEGM
-          </h1>
-          {/* Distress noise overlay on text */}
-          <div 
-            className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-            }}
-          />
-        </div>
+        <h1 
+          className={`font-headline text-7xl md:text-9xl font-black tracking-wide transition-all duration-100 ${
+            glitch ? 'translate-x-1' : ''
+          }`}
+          style={{
+            color: glitch ? '#ff0040' : '#ffffff',
+            textShadow: glitch 
+              ? '-3px 0 #00ff41, 3px 0 #ff0040, 0 0 20px rgba(255,0,64,0.5)' 
+              : '0 0 60px rgba(0,255,65,0.3), 0 0 120px rgba(0,255,65,0.1)',
+            letterSpacing: '0.02em',
+          }}
+        >
+          PHLEGM
+        </h1>
         
-        <p className="font-body mt-6 text-zinc-500 tracking-[0.3em] uppercase text-sm">
+        <p className="font-body mt-6 text-zinc-400 tracking-[0.3em] uppercase text-sm">
           {tagline}
         </p>
         
