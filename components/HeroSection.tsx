@@ -3,15 +3,35 @@
 import { useState, useEffect } from 'react';
 import { HeroContent } from '@/types/database';
 
+const taglines = [
+  'SEATTLE UNDERGROUND',
+  "THIS AIN'T GONNA BE PRETTY",
+  'VERSES HIT HARD, HOOKS THAT STICK',
+  "SEATTLE'S BAD IDEA DONE RIGHT",
+  'RAISED IN RAIN. BUILT IN STATIC.',
+  'THE SOUND OF A GOOD BAD MOOD',
+  'SURREAL. SICK. SHARP.',
+];
+
 interface HeroSectionProps {
   content: HeroContent | null;
 }
 
 export default function HeroSection({ content }: HeroSectionProps) {
-  const tagline = content?.tagline || 'Seattle Underground';
   const [glitch, setGlitch] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+  const [isGlitchingOut, setIsGlitchingOut] = useState(false);
+  const [shuffledTaglines, setShuffledTaglines] = useState<string[]>([]);
 
-  // Glitch effect interval
+  // Shuffle taglines on mount
+  useEffect(() => {
+    const shuffled = [...taglines].sort(() => Math.random() - 0.5);
+    setShuffledTaglines(shuffled);
+  }, []);
+
+  // Title glitch effect interval
   useEffect(() => {
     const glitchInterval = setInterval(() => {
       setGlitch(true);
@@ -19,6 +39,40 @@ export default function HeroSection({ content }: HeroSectionProps) {
     }, 4000);
     return () => clearInterval(glitchInterval);
   }, []);
+
+  // Typewriter effect
+  useEffect(() => {
+    if (shuffledTaglines.length === 0) return;
+    
+    const currentTagline = shuffledTaglines[currentTaglineIndex];
+    
+    if (isTyping) {
+      if (displayedText.length < currentTagline.length) {
+        const timeout = setTimeout(() => {
+          setDisplayedText(currentTagline.slice(0, displayedText.length + 1));
+        }, 50 + Math.random() * 30); // Slight randomness for natural feel
+        return () => clearTimeout(timeout);
+      } else {
+        // Finished typing, wait 5 seconds then glitch out
+        const timeout = setTimeout(() => {
+          setIsGlitchingOut(true);
+          setTimeout(() => {
+            setIsGlitchingOut(false);
+            setDisplayedText('');
+            setIsTyping(false);
+          }, 200);
+        }, 5000);
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      // Wait 3 seconds then start next tagline
+      const timeout = setTimeout(() => {
+        setCurrentTaglineIndex((prev) => (prev + 1) % shuffledTaglines.length);
+        setIsTyping(true);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [displayedText, isTyping, currentTaglineIndex, shuffledTaglines]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -50,7 +104,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
       {/* Content */}
       <div className="relative z-10 text-center px-4">
         <h1 
-          className={`font-headline text-7xl md:text-9xl font-black tracking-wide transition-all duration-100 ${
+          className={`font-headline text-7xl md:text-9xl font-black transition-all duration-100 ${
             glitch ? 'translate-x-1' : ''
           }`}
           style={{
@@ -64,9 +118,22 @@ export default function HeroSection({ content }: HeroSectionProps) {
           PHLEGM
         </h1>
         
-        <p className="font-body mt-6 text-zinc-400 tracking-[0.3em] uppercase text-sm">
-          {tagline}
-        </p>
+        {/* Animated typewriter tagline */}
+        <div className="h-8 mt-6 flex items-center justify-center">
+          <p 
+            className={`font-body text-zinc-400 tracking-[0.2em] uppercase text-sm transition-all duration-100 ${
+              isGlitchingOut ? 'opacity-0 translate-x-2 text-[#ff0040]' : 'opacity-100'
+            }`}
+            style={{
+              textShadow: isGlitchingOut ? '-2px 0 #00ff41, 2px 0 #ff0040' : 'none',
+            }}
+          >
+            {displayedText}
+            {isTyping && displayedText.length < (shuffledTaglines[currentTaglineIndex]?.length || 0) && (
+              <span className="animate-pulse text-[#00ff41]">|</span>
+            )}
+          </p>
+        </div>
         
         <a
           href="https://www.tiktok.com/@phlegmssg"
