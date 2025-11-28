@@ -9,11 +9,16 @@ interface PastShowsProps {
 
 export default function PastShows({ shows }: PastShowsProps) {
   return (
-    <section className="py-16 px-4 bg-zinc-950">
+    <section className="py-24 px-4 bg-zinc-950">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-black tracking-tight mb-8 text-center">
-          Past Shows
-        </h2>
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-12">
+          <div className="w-2 h-2 bg-zinc-600" />
+          <h2 className="font-body text-xs tracking-[0.4em] text-zinc-500 uppercase">
+            Past Shows
+          </h2>
+        </div>
+        
         <div className="space-y-6">
           {shows.map((show) => (
             <PastShowCard key={show.id} show={show} />
@@ -69,22 +74,22 @@ function PastShowCard({ show }: { show: PastShow }) {
         <>
           <button
             onClick={prevImage}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors z-10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-[#00ff41] text-white hover:text-black flex items-center justify-center transition-colors z-10"
           >
-            <ChevronLeftIcon className="w-6 h-6" />
+            <ChevronLeftIcon className="w-5 h-5" />
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors z-10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-[#00ff41] text-white hover:text-black flex items-center justify-center transition-colors z-10"
           >
-            <ChevronRightIcon className="w-6 h-6" />
+            <ChevronRightIcon className="w-5 h-5" />
           </button>
         </>
       )}
       
       {/* Image counter - top right */}
       {hasMultipleImages && (
-        <div className="absolute top-4 right-4 px-2 py-1 bg-black/60 text-xs z-10">
+        <div className="absolute top-4 right-4 px-2 py-1 bg-black/70 font-body text-xs z-10">
           {currentImageIndex + 1} / {show.image_urls.length}
         </div>
       )}
@@ -97,7 +102,7 @@ function PastShowCard({ show }: { show: PastShow }) {
               key={i}
               onClick={() => setCurrentImageIndex(i)}
               className={`w-2 h-2 rounded-full transition-colors ${
-                i === currentImageIndex ? 'bg-[#00ff41]' : 'bg-white/40 hover:bg-white/60'
+                i === currentImageIndex ? 'bg-[#00ff41]' : 'bg-white/40 hover:bg-white/70'
               }`}
             />
           ))}
@@ -108,17 +113,17 @@ function PastShowCard({ show }: { show: PastShow }) {
       <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
         <div className="max-w-2xl">
           {show.event_name && (
-            <span className="inline-block px-3 py-1 border border-[#00ff41] text-[#00ff41] text-xs uppercase tracking-wider mb-3">
+            <span className="inline-block bg-[#00ff41]/10 border border-[#00ff41]/30 text-[#00ff41] px-3 py-1 font-body text-xs tracking-wider uppercase mb-3">
               {show.event_name}
             </span>
           )}
-          <p className="text-[#00ff41] tracking-widest text-sm mb-1">
+          <p className="font-body text-[#00ff41] tracking-wider text-sm mb-2">
             {formattedDate}
           </p>
-          <h3 className="text-3xl md:text-4xl font-black tracking-tight">
+          <h3 className="font-headline text-3xl md:text-4xl text-white group-hover:text-[#00ff41] transition-colors">
             {show.venue}
           </h3>
-          <p className="text-zinc-400 flex items-center gap-1 mt-2">
+          <p className="font-body text-zinc-500 flex items-center gap-2 mt-2 text-sm">
             <LocationIcon className="w-4 h-4" />
             {show.city}
           </p>
