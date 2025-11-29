@@ -17,9 +17,19 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
 
   const aspectRatio = VIDEO_CONFIG.width / VIDEO_CONFIG.height;
 
+  // Shared close button component
+  const CloseButtonBottom = () => (
+    <button
+      onClick={onClose}
+      className="w-full py-4 mt-6 border border-zinc-700 text-zinc-500 hover:text-[#00ff41] hover:border-[#00ff41] transition-colors uppercase tracking-[0.3em] text-sm font-mono"
+    >
+      Close
+    </button>
+  );
+
   return (
     <div className="fixed inset-0 z-[60] bg-black">
-      {/* Close Button */}
+      {/* Close Button - Top Right */}
       <button
         onClick={onClose}
         className="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-500 hover:text-[#00ff41] transition-colors text-3xl z-[70]"
@@ -29,11 +39,11 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
       </button>
 
       {/* Mobile Layout - stacked, full bleed */}
-      <div className="md:hidden h-full flex flex-col overflow-hidden">
-        {/* Video - full width, aspect ratio locked */}
+      <div className="md:hidden h-full overflow-y-auto">
+        {/* Video - full width, max 50% of viewport height */}
         <div 
           className="w-full flex-shrink-0 bg-black"
-          style={{ aspectRatio: aspectRatio }}
+          style={{ aspectRatio: aspectRatio, maxHeight: '50vh' }}
         >
           <video
             src={VIDEO_CONFIG.url}
@@ -45,8 +55,8 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
           />
         </div>
 
-        {/* Bio - fills remaining space, scrolls */}
-        <div className="flex-1 overflow-y-auto bg-zinc-900 border-t border-zinc-700">
+        {/* Bio - scrolls with page */}
+        <div className="bg-zinc-900 border-t border-zinc-700">
           <div className="p-6">
             <h2 
               className="text-[#00ff41] text-3xl font-black tracking-tight mb-4" 
@@ -101,6 +111,8 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 Currently transmitting from coordinates that don&apos;t appear on maps with songs that arrive before you press play.
               </p>
             </div>
+
+            <CloseButtonBottom />
           </div>
         </div>
       </div>
@@ -178,6 +190,8 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 Currently transmitting from coordinates that don&apos;t appear on maps with songs that arrive before you press play.
               </p>
             </div>
+
+            <CloseButtonBottom />
           </div>
         </div>
       </div>
