@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import BioModal from './BioModal';
 
 export default function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isBioOpen, setIsBioOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -66,7 +68,11 @@ export default function HamburgerMenu() {
             <button
               key={item.action}
               onClick={() => {
-                console.log(`Open ${item.action} modal`);
+                if (item.action === 'bio') {
+                  setIsBioOpen(true);
+                } else {
+                  console.log(`Open ${item.action} modal`);
+                }
                 setIsOpen(false);
               }}
               className="text-white text-3xl font-bold tracking-[0.3em] uppercase mb-8 hover:text-[#00ff41] transition-colors font-mono"
@@ -76,6 +82,8 @@ export default function HamburgerMenu() {
           ))}
         </nav>
       </div>
+
+      <BioModal isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} />
     </>
   );
 }
