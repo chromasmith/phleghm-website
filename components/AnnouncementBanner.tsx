@@ -1,18 +1,50 @@
 'use client';
 
-// Banner configuration - will be controlled by admin/database later
-const BANNER_CONFIG = {
-  enabled: true,
-  text: 'NEW SINGLE "STATIC DREAMS" OUT NOW',
-  subtext: 'Available on all platforms',
-  media: null, // URL to image or video, or null for text-only
-  mediaType: null, // 'image' | 'video' | null
-  linkUrl: 'https://open.spotify.com/artist/3brB4yhi4ZJtxQkbZX0wkk',
-  linkText: 'LISTEN NOW',
-};
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+interface BannerData {
+  enabled: boolean;
+  text: string;
+  subtext: string | null;
+  media_url: string | null;
+  media_type: 'image' | 'video' | null;
+  link_url: string | null;
+  link_text: string | null;
+}
 
 export default function AnnouncementBanner() {
-  if (!BANNER_CONFIG.enabled) return null;
+  const [banner, setBanner] = useState<BannerData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBanner() {
+      const { data, error } = await supabase
+        .from('announcement_banner')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error('Error fetching announcement banner:', error);
+        setLoading(false);
+        return;
+      }
+
+      setBanner(data);
+      setLoading(false);
+    }
+
+    fetchBanner();
+  }, []);
+
+  // Don't render while loading or if disabled/no data
+  if (loading || !banner || !banner.enabled) return null;
 
   return (
     <div className="w-full bg-zinc-900 border-y border-zinc-800">
@@ -21,20 +53,20 @@ export default function AnnouncementBanner() {
         <div className="flex flex-col md:flex-row items-center">
           
           {/* Media Section (if present) */}
-          {BANNER_CONFIG.media && BANNER_CONFIG.mediaType === 'image' && (
+          {banner.media_url && banner.media_type === 'image' && (
             <div className="w-full md:w-48 h-32 md:h-auto md:aspect-square flex-shrink-0 bg-black">
               <img 
-                src={BANNER_CONFIG.media} 
+                src={banner.media_url} 
                 alt="Announcement" 
                 className="w-full h-full object-cover"
               />
             </div>
           )}
           
-          {BANNER_CONFIG.media && BANNER_CONFIG.mediaType === 'video' && (
+          {banner.media_url && banner.media_type === 'video' && (
             <div className="w-full md:w-48 h-32 md:h-auto md:aspect-square flex-shrink-0 bg-black">
               <video 
-                src={BANNER_CONFIG.media} 
+                src={banner.media_url} 
                 autoPlay 
                 loop 
                 muted 
@@ -52,24 +84,24 @@ export default function AnnouncementBanner() {
                 className="text-[#00ff41] text-lg md:text-xl font-black tracking-tight"
                 style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}
               >
-                {BANNER_CONFIG.text}
+                {banner.text}
               </p>
-              {BANNER_CONFIG.subtext && (
+              {banner.subtext && (
                 <p className="text-zinc-500 text-sm font-mono mt-1">
-                  {BANNER_CONFIG.subtext}
+                  {banner.subtext}
                 </p>
               )}
             </div>
 
             {/* CTA Button */}
-            {BANNER_CONFIG.linkUrl && BANNER_CONFIG.linkText && (
+            {banner.link_url && banner.link_text && (
               <a
-                href={BANNER_CONFIG.linkUrl}
+                href={banner.link_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-shrink-0 px-6 py-3 bg-[#00ff41] text-black font-bold uppercase tracking-[0.15em] text-sm hover:bg-white transition-colors"
               >
-                {BANNER_CONFIG.linkText}
+                {banner.link_text}
               </a>
             )}
           </div>
