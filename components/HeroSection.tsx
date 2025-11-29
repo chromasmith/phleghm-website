@@ -27,6 +27,8 @@ export default function HeroSection({ content }: HeroSectionProps) {
   const [phase, setPhase] = useState<'typing' | 'visible' | 'glitching' | 'waiting'>('typing');
   const [isGlitchingOut, setIsGlitchingOut] = useState(false);
   const [shuffledTaglines, setShuffledTaglines] = useState<string[]>([]);
+  const [visibleSplatters, setVisibleSplatters] = useState<Set<number>>(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
+  const [splatterGlitch, setSplatterGlitch] = useState(false);
   const jitterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Shuffle taglines on mount
@@ -69,21 +71,53 @@ export default function HeroSection({ content }: HeroSectionProps) {
     };
   }, []);
 
+  // Animated splatters - random glitchy appearance/disappearance
+  useEffect(() => {
+    const splatterInterval = setInterval(() => {
+      // Randomly decide to glitch the splatters
+      if (Math.random() > 0.6) {
+        setSplatterGlitch(true);
+        
+        // Randomly hide/show some splatters
+        const newVisible = new Set<number>();
+        for (let i = 0; i < 8; i++) {
+          if (Math.random() > 0.3) {
+            newVisible.add(i);
+          }
+        }
+        setVisibleSplatters(newVisible);
+        
+        // Reset after brief glitch
+        setTimeout(() => {
+          setSplatterGlitch(false);
+          // Restore most splatters but keep some randomness
+          const restored = new Set<number>();
+          for (let i = 0; i < 8; i++) {
+            if (Math.random() > 0.15) {
+              restored.add(i);
+            }
+          }
+          setVisibleSplatters(restored);
+        }, 100 + Math.random() * 100);
+      }
+    }, 2000 + Math.random() * 2000);
+    
+    return () => clearInterval(splatterInterval);
+  }, []);
+
   const currentTagline = shuffledTaglines[currentTaglineIndex] || '';
 
-  // Simplified typewriter effect - preserves spaces properly
+  // Typewriter effect
   useEffect(() => {
     if (shuffledTaglines.length === 0) return;
 
     if (phase === 'typing') {
       if (displayedText.length < currentTagline.length) {
         const timeout = setTimeout(() => {
-          // Add next character (including spaces)
           setDisplayedText(currentTagline.slice(0, displayedText.length + 1));
         }, 40 + Math.random() * 60);
         return () => clearTimeout(timeout);
       } else {
-        // Finished typing, wait 5 seconds
         const timeout = setTimeout(() => {
           setPhase('glitching');
         }, 5000);
@@ -130,6 +164,15 @@ export default function HeroSection({ content }: HeroSectionProps) {
     };
   };
 
+  // Get random offset for splatter glitch
+  const getSplatterGlitchStyle = (): React.CSSProperties => {
+    if (!splatterGlitch) return {};
+    return {
+      transform: `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`,
+      opacity: 0.8 + Math.random() * 0.2,
+    };
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Desktop video (horizontal) */}
@@ -154,13 +197,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
         <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4" type="video/mp4" />
       </video>
       
-      {/* Scanlines overlay - on video, behind content */}
+      {/* Scanlines overlay - increased intensity */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 1,
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)',
-          opacity: 0.5,
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
+          opacity: 0.7,
         }}
       />
       
@@ -197,94 +240,117 @@ export default function HeroSection({ content }: HeroSectionProps) {
             ))}
           </h1>
           
-          {/* Black distress marks ON TOP of text */}
-          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 20 }}>
-            {/* Spray splatter cluster 1 - on the P */}
-            <div 
-              className="absolute"
-              style={{
-                left: '8%',
-                top: '35%',
-                width: '6px',
-                height: '6px',
-                background: '#000',
-                borderRadius: '50%',
-                boxShadow: '2px 3px 0 1px #000, -1px 5px 0 0px #000, 3px -1px 0 0px #000',
-              }}
-            />
+          {/* Animated black distress marks */}
+          <div 
+            className="absolute inset-0 pointer-events-none transition-all duration-75" 
+            style={{ zIndex: 20, ...getSplatterGlitchStyle() }}
+          >
+            {/* Splatter 0 - on the P */}
+            {visibleSplatters.has(0) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  left: '8%',
+                  top: '35%',
+                  width: '6px',
+                  height: '6px',
+                  background: '#000',
+                  borderRadius: '50%',
+                  boxShadow: '2px 3px 0 1px #000, -1px 5px 0 0px #000, 3px -1px 0 0px #000',
+                }}
+              />
+            )}
             
-            {/* Spray splatter cluster 2 - between H and L */}
-            <div 
-              className="absolute"
-              style={{
-                left: '28%',
-                top: '25%',
-                width: '4px',
-                height: '4px',
-                background: '#000',
-                borderRadius: '50%',
-                boxShadow: '1px 2px 0 0px #000, -2px 1px 0 1px #000',
-              }}
-            />
+            {/* Splatter 1 - between H and L */}
+            {visibleSplatters.has(1) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  left: '28%',
+                  top: '25%',
+                  width: '4px',
+                  height: '4px',
+                  background: '#000',
+                  borderRadius: '50%',
+                  boxShadow: '1px 2px 0 0px #000, -2px 1px 0 1px #000',
+                }}
+              />
+            )}
             
-            {/* Spray drip on E */}
-            <div 
-              className="absolute"
-              style={{
-                left: '52%',
-                top: '45%',
-                width: '3px',
-                height: '18px',
-                background: 'linear-gradient(180deg, #000 60%, transparent)',
-                borderRadius: '50% 50% 50% 50% / 10% 10% 90% 90%',
-              }}
-            />
+            {/* Splatter 2 - drip on E */}
+            {visibleSplatters.has(2) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  left: '52%',
+                  top: '45%',
+                  width: '3px',
+                  height: '18px',
+                  background: 'linear-gradient(180deg, #000 60%, transparent)',
+                  borderRadius: '50% 50% 50% 50% / 10% 10% 90% 90%',
+                }}
+              />
+            )}
             
-            {/* Small speckles */}
-            <div className="absolute" style={{ left: '18%', top: '55%', width: '2px', height: '2px', background: '#000', borderRadius: '50%' }} />
-            <div className="absolute" style={{ left: '72%', top: '30%', width: '3px', height: '3px', background: '#000', borderRadius: '50%' }} />
-            <div 
-              className="absolute"
-              style={{
-                left: '85%',
-                top: '50%',
-                width: '2px',
-                height: '2px',
-                background: '#000',
-                borderRadius: '50%',
-                boxShadow: '-2px 3px 0 0px #000, 1px -2px 0 0px #000',
-              }}
-            />
+            {/* Splatter 3 - small speckle */}
+            {visibleSplatters.has(3) && (
+              <div className="absolute transition-opacity duration-75" style={{ left: '18%', top: '55%', width: '2px', height: '2px', background: '#000', borderRadius: '50%' }} />
+            )}
             
-            {/* Scratch on G */}
-            <div 
-              className="absolute"
-              style={{
-                left: '68%',
-                top: '40%',
-                width: '12px',
-                height: '2px',
-                background: '#000',
-                transform: 'rotate(-25deg)',
-                opacity: 0.7,
-              }}
-            />
+            {/* Splatter 4 - speckle on G area */}
+            {visibleSplatters.has(4) && (
+              <div className="absolute transition-opacity duration-75" style={{ left: '72%', top: '30%', width: '3px', height: '3px', background: '#000', borderRadius: '50%' }} />
+            )}
             
-            {/* Paint fleck near M */}
-            <div 
-              className="absolute"
-              style={{
-                right: '5%',
-                top: '35%',
-                width: '5px',
-                height: '7px',
-                background: '#000',
-                borderRadius: '40% 60% 30% 70%',
-                transform: 'rotate(15deg)',
-              }}
-            />
+            {/* Splatter 5 - cluster near M */}
+            {visibleSplatters.has(5) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  left: '85%',
+                  top: '50%',
+                  width: '2px',
+                  height: '2px',
+                  background: '#000',
+                  borderRadius: '50%',
+                  boxShadow: '-2px 3px 0 0px #000, 1px -2px 0 0px #000',
+                }}
+              />
+            )}
             
-            {/* Tiny scattered dots */}
+            {/* Splatter 6 - scratch on G */}
+            {visibleSplatters.has(6) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  left: '68%',
+                  top: '40%',
+                  width: '12px',
+                  height: '2px',
+                  background: '#000',
+                  transform: 'rotate(-25deg)',
+                  opacity: 0.7,
+                }}
+              />
+            )}
+            
+            {/* Splatter 7 - fleck near M */}
+            {visibleSplatters.has(7) && (
+              <div 
+                className="absolute transition-opacity duration-75"
+                style={{
+                  right: '5%',
+                  top: '35%',
+                  width: '5px',
+                  height: '7px',
+                  background: '#000',
+                  borderRadius: '40% 60% 30% 70%',
+                  transform: 'rotate(15deg)',
+                }}
+              />
+            )}
+            
+            {/* Tiny scattered dots - always visible */}
             <div 
               className="absolute"
               style={{
@@ -299,7 +365,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
           </div>
         </div>
         
-        {/* Typewriter tagline - using pre to preserve whitespace */}
+        {/* Typewriter tagline */}
         <div className="h-10 flex items-center justify-center">
           <p 
             className={`font-body text-lg md:text-xl font-bold tracking-wider transition-all duration-75 whitespace-pre ${
@@ -332,11 +398,6 @@ export default function HeroSection({ content }: HeroSectionProps) {
           <TikTokIcon className="w-5 h-5" />
           Watch on TikTok
         </a>
-      </div>
-      
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" style={{ zIndex: 10 }}>
-        <div className="w-px h-16 bg-gradient-to-b from-transparent via-[#00ff41] to-transparent opacity-50" />
       </div>
     </section>
   );
