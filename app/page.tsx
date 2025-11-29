@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { HeroContent, UpcomingShow, PastShow } from '@/types/database';
+import HamburgerMenu from '@/components/HamburgerMenu';
 import HeroSection from '@/components/HeroSection';
 import SocialLinks from '@/components/SocialLinks';
 import SpotifyPlayer from '@/components/SpotifyPlayer';
@@ -43,6 +44,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white">
+      <HamburgerMenu />
       <HeroSection content={heroContent} />
       <SocialLinks />
       <SpotifyPlayer />
