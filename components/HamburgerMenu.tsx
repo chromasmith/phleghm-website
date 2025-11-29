@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import BioModal from './BioModal';
+import ContactModal from './ContactModal';
 
 export default function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [isBioOpen, setIsBioOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -50,7 +52,7 @@ export default function HamburgerMenu() {
       {/* Slide-out Panel */}
       <div
         className={`fixed top-0 right-0 h-full w-72 bg-zinc-900 border-l border-zinc-700 z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+         isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Close Button */}
@@ -70,8 +72,8 @@ export default function HamburgerMenu() {
               onClick={() => {
                 if (item.action === 'bio') {
                   setIsBioOpen(true);
-                } else {
-                  console.log(`Open ${item.action} modal`);
+                } else if (item.action === 'contact') {
+                  setIsContactOpen(true);
                 }
                 setIsOpen(false);
               }}
@@ -84,6 +86,7 @@ export default function HamburgerMenu() {
       </div>
 
       <BioModal isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} />
+      <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </>
   );
 }
