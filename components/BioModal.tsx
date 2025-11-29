@@ -1,21 +1,89 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 interface BioModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Video configuration - update these values if video changes
-const VIDEO_CONFIG = {
-  url: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Phlegm_MeVme.mp4.mp4',
-  width: 576,
-  height: 758,
+interface BioContent {
+  hero_video_url: string | null;
+  hero_video_width: number;
+  hero_video_height: number;
+  title: string;
+  tagline: string;
+  bio_text: string;
+  speaks_in_items: string[];
+  closing_text: string;
+}
+
+// Fallback config in case database fetch fails
+const FALLBACK_CONFIG = {
+  hero_video_url: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Phlegm_MeVme.mp4.mp4',
+  hero_video_width: 576,
+  hero_video_height: 758,
+  title: 'PHLEGM',
+  tagline: 'Rain. Static. The space between.',
+  bio_text: '',
+  speaks_in_items: [],
+  closing_text: '',
 };
 
 export default function BioModal({ isOpen, onClose }: BioModalProps) {
+  const [bio, setBio] = useState<BioContent>(FALLBACK_CONFIG);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    async function fetchBio() {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('bio_content')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error('Error fetching bio content:', error);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        setBio({
+          hero_video_url: data.hero_video_url,
+          hero_video_width: data.hero_video_width || 576,
+          hero_video_height: data.hero_video_height || 758,
+          title: data.title || 'PHLEGM',
+          tagline: data.tagline || '',
+          bio_text: data.bio_text || '',
+          speaks_in_items: data.speaks_in_items || [],
+          closing_text: data.closing_text || '',
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchBio();
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const aspectRatio = VIDEO_CONFIG.width / VIDEO_CONFIG.height;
+  const aspectRatio = bio.hero_video_width / bio.hero_video_height;
+
+  // Split bio_text into paragraphs
+  const bioParagraphs = bio.bio_text.split('\n\n').filter(p => p.trim());
+  const closingParagraphs = bio.closing_text.split('\n\n').filter(p => p.trim());
 
   // Shared close button component
   const CloseButtonBottom = () => (
@@ -41,78 +109,66 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
       {/* Mobile Layout - stacked, full bleed, scrollable page */}
       <div className="md:hidden h-full overflow-y-auto">
         {/* Video - full width, natural aspect ratio, no cropping */}
-        <div 
-          className="w-full bg-black"
-          style={{ aspectRatio: aspectRatio }}
-        >
-          <video
-            src={VIDEO_CONFIG.url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-contain"
-          />
-        </div>
+        {bio.hero_video_url && (
+          <div 
+            className="w-full bg-black"
+            style={{ aspectRatio: aspectRatio }}
+          >
+            <video
+              src={bio.hero_video_url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )}
 
         {/* Bio - below video, user scrolls to see */}
         <div className="bg-zinc-900 border-t border-zinc-700">
           <div className="p-6">
-            <h2 
-              className="text-[#00ff41] text-3xl font-black tracking-tight mb-4" 
-              style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}
-            >
-              PHLEGM
-            </h2>
+            {loading ? (
+              <div className="text-zinc-500 font-mono text-sm">Loading...</div>
+            ) : (
+              <>
+                <h2 
+                  className="text-[#00ff41] text-3xl font-black tracking-tight mb-4" 
+                  style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}
+                >
+                  {bio.title}
+                </h2>
 
-            <p className="text-zinc-400 text-base font-mono italic mb-4">
-              Rain. Static. The space between.
-            </p>
+                <p className="text-zinc-400 text-base font-mono italic mb-4">
+                  {bio.tagline}
+                </p>
 
-            <div className="text-zinc-300 font-mono text-sm leading-relaxed space-y-3">
-              <p>
-                Born in frequencies that bleed through AM radios at 3:47 AM. Voices from the overpass. Dreams that taste like copper pennies.
-              </p>
-              <p>
-                Seattle raised him wrong. Or right. Depending on how you hold the mirror.
-              </p>
-              <p>
-                Teenage notebooks. Ink running in the drizzle. Words that move when you&apos;re not looking directly at them. Started there. Or maybe it started him.
-              </p>
-              <p>
-                Sound as archaeology. Digging through the city&apos;s fever dreams. Beats that remember being heartbeats. Vocals from the place where sleep forgot to wake up.
-              </p>
+                <div className="text-zinc-300 font-mono text-sm leading-relaxed space-y-3">
+                  {bioParagraphs.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
 
-              <div className="mt-4">
-                <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-2">He speaks in:</p>
-                <ul className="space-y-1 text-zinc-400 text-sm">
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Broken frequencies
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Half-remembered conversations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> The color between blue and grey
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Basement philosophy
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Midnight mathematics
-                  </li>
-                </ul>
-              </div>
+                  {bio.speaks_in_items.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-2">He speaks in:</p>
+                      <ul className="space-y-1 text-zinc-400 text-sm">
+                        {bio.speaks_in_items.map((item, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <span className="text-[#00ff41]">•</span> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-              <p className="mt-4">
-                The underground found him first and the internet is still processing.
-              </p>
-              <p>
-                Currently transmitting from coordinates that don&apos;t appear on maps with songs that arrive before you press play.
-              </p>
-            </div>
+                  {closingParagraphs.map((paragraph, index) => (
+                    <p key={index} className="mt-4">{paragraph}</p>
+                  ))}
+                </div>
 
-            <CloseButtonBottom />
+                <CloseButtonBottom />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -120,78 +176,66 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
       {/* Desktop Layout - side by side, full bleed */}
       <div className="hidden md:flex h-full">
         {/* Video - height fills viewport, width from aspect ratio */}
-        <div 
-          className="h-full flex-shrink-0 bg-black"
-          style={{ aspectRatio: aspectRatio }}
-        >
-          <video
-            src={VIDEO_CONFIG.url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {bio.hero_video_url && (
+          <div 
+            className="h-full flex-shrink-0 bg-black"
+            style={{ aspectRatio: aspectRatio }}
+          >
+            <video
+              src={bio.hero_video_url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
 
         {/* Bio - fills remaining width, scrolls internally */}
         <div className="flex-1 overflow-y-auto bg-zinc-900 border-l border-zinc-700">
           <div className="p-8 lg:p-12">
-            <h2 
-              className="text-[#00ff41] text-5xl lg:text-6xl font-black tracking-tight mb-6" 
-              style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}
-            >
-              PHLEGM
-            </h2>
+            {loading ? (
+              <div className="text-zinc-500 font-mono text-sm">Loading...</div>
+            ) : (
+              <>
+                <h2 
+                  className="text-[#00ff41] text-5xl lg:text-6xl font-black tracking-tight mb-6" 
+                  style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}
+                >
+                  {bio.title}
+                </h2>
 
-            <p className="text-zinc-400 text-xl lg:text-2xl font-mono italic mb-8">
-              Rain. Static. The space between.
-            </p>
+                <p className="text-zinc-400 text-xl lg:text-2xl font-mono italic mb-8">
+                  {bio.tagline}
+                </p>
 
-            <div className="text-zinc-300 font-mono text-base lg:text-lg leading-relaxed space-y-5">
-              <p>
-                Born in frequencies that bleed through AM radios at 3:47 AM. Voices from the overpass. Dreams that taste like copper pennies.
-              </p>
-              <p>
-                Seattle raised him wrong. Or right. Depending on how you hold the mirror.
-              </p>
-              <p>
-                Teenage notebooks. Ink running in the drizzle. Words that move when you&apos;re not looking directly at them. Started there. Or maybe it started him.
-              </p>
-              <p>
-                Sound as archaeology. Digging through the city&apos;s fever dreams. Beats that remember being heartbeats. Vocals from the place where sleep forgot to wake up.
-              </p>
+                <div className="text-zinc-300 font-mono text-base lg:text-lg leading-relaxed space-y-5">
+                  {bioParagraphs.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
 
-              <div className="mt-8">
-                <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-3">He speaks in:</p>
-                <ul className="space-y-2 text-zinc-400">
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Broken frequencies
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Half-remembered conversations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> The color between blue and grey
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Basement philosophy
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-[#00ff41]">•</span> Midnight mathematics
-                  </li>
-                </ul>
-              </div>
+                  {bio.speaks_in_items.length > 0 && (
+                    <div className="mt-8">
+                      <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-3">He speaks in:</p>
+                      <ul className="space-y-2 text-zinc-400">
+                        {bio.speaks_in_items.map((item, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <span className="text-[#00ff41]">•</span> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-              <p className="mt-8">
-                The underground found him first and the internet is still processing.
-              </p>
-              <p>
-                Currently transmitting from coordinates that don&apos;t appear on maps with songs that arrive before you press play.
-              </p>
-            </div>
+                  {closingParagraphs.map((paragraph, index) => (
+                    <p key={index} className="mt-8">{paragraph}</p>
+                  ))}
+                </div>
 
-            <CloseButtonBottom />
+                <CloseButtonBottom />
+              </>
+            )}
           </div>
         </div>
       </div>
