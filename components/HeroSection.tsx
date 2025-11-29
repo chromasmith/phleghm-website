@@ -2,8 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { HeroContent } from '@/types/database';
+import { createClient } from '@supabase/supabase-js';
 
-const taglines = [
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+// Fallback taglines in case database fetch fails
+const FALLBACK_TAGLINES = [
   'SEATTLE UNDERGROUND',
   "THIS AIN'T GONNA BE PRETTY",
   'VERSES HIT HARD, HOOKS THAT STICK',
@@ -27,15 +34,41 @@ export default function HeroSection({ content }: HeroSectionProps) {
   const [phase, setPhase] = useState<'typing' | 'visible' | 'glitching' | 'waiting'>('typing');
   const [isGlitchingOut, setIsGlitchingOut] = useState(false);
   const [shuffledTaglines, setShuffledTaglines] = useState<string[]>([]);
+  const [fetchedTaglines, setFetchedTaglines] = useState<string[]>([]);
+  const [taglinesLoaded, setTaglinesLoaded] = useState(false);
   const [visibleSplatters, setVisibleSplatters] = useState<Set<number>>(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
   const [splatterGlitch, setSplatterGlitch] = useState(false);
   const jitterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Shuffle taglines on mount
+  // Fetch taglines from Supabase
   useEffect(() => {
-    const shuffled = [...taglines].sort(() => Math.random() - 0.5);
-    setShuffledTaglines(shuffled);
+    async function fetchTaglines() {
+      const { data, error } = await supabase
+        .from('taglines')
+        .select('text, sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching taglines:', error);
+        setFetchedTaglines(FALLBACK_TAGLINES);
+      } else if (data && data.length > 0) {
+        setFetchedTaglines(data.map(t => t.text));
+      } else {
+        setFetchedTaglines(FALLBACK_TAGLINES);
+      }
+      setTaglinesLoaded(true);
+    }
+    fetchTaglines();
   }, []);
+
+  // Shuffle taglines when fetched taglines are loaded
+  useEffect(() => {
+    if (!taglinesLoaded || fetchedTaglines.length === 0) return;
+    
+    const shuffled = [...fetchedTaglines].sort(() => Math.random() - 0.5);
+    setShuffledTaglines(shuffled);
+  }, [fetchedTaglines, taglinesLoaded]);
 
   // Title glitch effect (every 4 seconds)
   useEffect(() => {
