@@ -27,13 +27,16 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
           ✕
         </button>
 
-        {/* Hero Photo */}
+        {/* Hero Video */}
         <div className="relative w-full aspect-[3/4] max-h-[50vh] overflow-hidden border border-zinc-700">
-          <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
-            <span className="text-zinc-600 uppercase tracking-[0.3em] text-sm font-mono">
-              Photo Coming Soon
-            </span>
-          </div>
+          <video
+            src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Phlegm_MeVme.mp4.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           {/* Gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
