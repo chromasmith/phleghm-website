@@ -38,12 +38,12 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
         ✕
       </button>
 
-      {/* Mobile Layout - stacked, full bleed */}
+      {/* Mobile Layout - stacked, full bleed, scrollable page */}
       <div className="md:hidden h-full overflow-y-auto">
-        {/* Video - full width, max 50% of viewport height */}
+        {/* Video - full width, natural aspect ratio, no cropping */}
         <div 
-          className="w-full flex-shrink-0 bg-black"
-          style={{ aspectRatio: aspectRatio, maxHeight: '50vh' }}
+          className="w-full bg-black"
+          style={{ aspectRatio: aspectRatio }}
         >
           <video
             src={VIDEO_CONFIG.url}
@@ -51,11 +51,11 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
 
-        {/* Bio - scrolls with page */}
+        {/* Bio - below video, user scrolls to see */}
         <div className="bg-zinc-900 border-t border-zinc-700">
           <div className="p-6">
             <h2 
