@@ -8,18 +8,20 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface HeroVideos {
-  desktop_url: string;
-  mobile_url: string;
+interface VideoCardProps {
+  label: string;
+  aspect: string;
+  videoKey: 'desktop_url' | 'mobile_url';
+  previewClass: string;
 }
 
-const DEFAULT_VIDEOS: HeroVideos = {
+const DEFAULT_URLS = {
   desktop_url: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_720H_web2.mp4',
   mobile_url: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4'
 };
 
-export default function HeroVideoEditor() {
-  const [videos, setVideos] = useState<HeroVideos>(DEFAULT_VIDEOS);
+function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
+  const [url, setUrl] = useState(DEFAULT_URLS[videoKey]);
   const [settingId, setSettingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -27,27 +29,25 @@ export default function HeroVideoEditor() {
   const [success, setSuccess] = useState('');
   
   useEffect(() => {
-    fetchVideos();
+    fetchVideo();
   }, []);
   
-  async function fetchVideos() {
+  async function fetchVideo() {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('site_settings')
       .select('*')
-      .eq('key', 'hero_videos')
+      .eq('key', `hero_${videoKey}`)
       .single();
     
-    if (error && error.code !== 'PGRST116') {
-      setError('Failed to load video settings');
-    } else if (data) {
+    if (data) {
       setSettingId(data.id);
-      setVideos(data.value as HeroVideos);
+      setUrl(data.value?.url || DEFAULT_URLS[videoKey]);
     }
     setIsLoading(false);
   }
   
-  async function saveVideos() {
+  async function saveVideo() {
     setIsSaving(true);
     setError('');
     setSuccess('');
@@ -57,7 +57,7 @@ export default function HeroVideoEditor() {
       result = await supabase
         .from('site_settings')
         .update({
-          value: videos,
+          value: { url },
           updated_at: new Date().toISOString()
         })
         .eq('id', settingId);
@@ -65,8 +65,8 @@ export default function HeroVideoEditor() {
       result = await supabase
         .from('site_settings')
         .insert({
-          key: 'hero_videos',
-          value: videos
+          key: `hero_${videoKey}`,
+          value: { url }
         })
         .select()
         .single();
@@ -77,93 +77,93 @@ export default function HeroVideoEditor() {
     }
     
     if (result.error) {
-      setError('Failed to save video settings');
+      setError('Failed to save');
     } else {
-      setSuccess('Videos saved!');
+      setSuccess('Saved!');
       setTimeout(() => setSuccess(''), 2000);
     }
     setIsSaving(false);
   }
   
+  function handleUploadClick() {
+    alert('Direct upload coming soon. For now, upload to Bunny CDN and paste the URL.');
+  }
+  
   if (isLoading) {
-    return <div className="text-zinc-500">Loading video settings...</div>;
+    return (
+      <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+        <div className="text-zinc-500">Loading...</div>
+      </div>
+    );
   }
   
   return (
-    <div className="space-y-6">
-      {error && (
-        <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded">
-          {error}
-          <button onClick={() => setError('')} className="ml-2 underline">dismiss</button>
+    <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-medium text-white">{label}</h3>
+          <p className="text-xs text-zinc-500">{aspect}</p>
         </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-500/10 border border-green-500 text-green-500 px-4 py-2 rounded">
-          {success}
-        </div>
-      )}
-      
-      {/* Desktop Video */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium text-zinc-400">
-          Desktop Video (Landscape 16:9)
-        </label>
-        {videos.desktop_url && (
-          <video
-            src={videos.desktop_url}
-            className="w-full max-w-md rounded border border-zinc-700"
-            muted
-            playsInline
-            loop
-            autoPlay
-          />
-        )}
-        <input
-          type="url"
-          value={videos.desktop_url}
-          onChange={(e) => setVideos({ ...videos, desktop_url: e.target.value })}
-          placeholder="https://chromasmith-cdn.b-cdn.net/..."
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-green-500 text-sm"
-        />
+        {success && <span className="text-green-500 text-sm">{success}</span>}
+        {error && <span className="text-red-500 text-sm">{error}</span>}
       </div>
       
-      {/* Mobile Video */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium text-zinc-400">
-          Mobile Video (Portrait 9:16)
-        </label>
-        {videos.mobile_url && (
-          <video
-            src={videos.mobile_url}
-            className="w-32 rounded border border-zinc-700"
-            muted
-            playsInline
-            loop
-            autoPlay
-          />
-        )}
-        <input
-          type="url"
-          value={videos.mobile_url}
-          onChange={(e) => setVideos({ ...videos, mobile_url: e.target.value })}
-          placeholder="https://chromasmith-cdn.b-cdn.net/..."
-          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-green-500 text-sm"
+      {/* Preview */}
+      {url && (
+        <video
+          src={url}
+          className={`${previewClass} rounded border border-zinc-700`}
+          muted
+          playsInline
+          loop
+          autoPlay
         />
+      )}
+      
+      {/* URL Input */}
+      <input
+        type="url"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="https://chromasmith-cdn.b-cdn.net/..."
+        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-green-500 text-sm"
+      />
+      
+      {/* Actions */}
+      <div className="flex gap-2">
+        <button
+          onClick={handleUploadClick}
+          className="flex-1 py-2 bg-zinc-700 text-white text-sm font-medium rounded hover:bg-zinc-600 transition-colors"
+        >
+          UPLOAD
+        </button>
+        <button
+          onClick={saveVideo}
+          disabled={isSaving}
+          className="flex-1 py-2 bg-green-500 text-black text-sm font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
+        >
+          {isSaving ? 'SAVING...' : 'SAVE'}
+        </button>
       </div>
-      
-      <p className="text-xs text-zinc-600">
-        Upload videos to Bunny CDN, then paste the URL here.
-      </p>
-      
-      {/* Save Button */}
-      <button
-        onClick={saveVideos}
-        disabled={isSaving}
-        className="w-full py-3 bg-green-500 text-black font-bold rounded hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        {isSaving ? 'SAVING...' : 'SAVE VIDEOS'}
-      </button>
+    </div>
+  );
+}
+
+export default function HeroVideoEditor() {
+  return (
+    <div className="space-y-4">
+      <VideoCard
+        label="Desktop Video"
+        aspect="Landscape 16:9"
+        videoKey="desktop_url"
+        previewClass="w-full max-w-sm"
+      />
+      <VideoCard
+        label="Mobile Video"
+        aspect="Portrait 9:16"
+        videoKey="mobile_url"
+        previewClass="w-32"
+      />
     </div>
   );
 }
