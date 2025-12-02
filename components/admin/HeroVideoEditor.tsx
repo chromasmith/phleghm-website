@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import MediaUploader from './MediaUploader';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,7 +48,8 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
     setIsLoading(false);
   }
   
-  async function saveVideo() {
+  async function saveVideo(urlToSave?: string) {
+    const saveUrl = urlToSave || url;
     setIsSaving(true);
     setError('');
     setSuccess('');
@@ -57,7 +59,7 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       result = await supabase
         .from('site_settings')
         .update({
-          value: { url },
+          value: { url: saveUrl },
           updated_at: new Date().toISOString()
         })
         .eq('id', settingId);
@@ -66,7 +68,7 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
         .from('site_settings')
         .insert({
           key: `hero_${videoKey}`,
-          value: { url }
+          value: { url: saveUrl }
         })
         .select()
         .single();
@@ -85,8 +87,9 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
     setIsSaving(false);
   }
   
-  function handleUploadClick() {
-    alert('Direct upload coming soon. For now, upload to Bunny CDN and paste the URL.');
+  function handleUploadComplete(newUrl: string) {
+    setUrl(newUrl);
+    saveVideo(newUrl);
   }
   
   if (isLoading) {
@@ -130,17 +133,17 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       />
       
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-start">
+        <MediaUploader
+          onUploadComplete={handleUploadComplete}
+          folder="phleghm-website/hero"
+          accept="video/*"
+          label="Upload"
+        />
         <button
-          onClick={handleUploadClick}
-          className="flex-1 py-2 bg-zinc-700 text-white text-sm font-medium rounded hover:bg-zinc-600 transition-colors"
-        >
-          UPLOAD
-        </button>
-        <button
-          onClick={saveVideo}
+          onClick={() => saveVideo()}
           disabled={isSaving}
-          className="flex-1 py-2 bg-green-500 text-black text-sm font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-green-500 text-black text-sm font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
         >
           {isSaving ? 'SAVING...' : 'SAVE'}
         </button>
