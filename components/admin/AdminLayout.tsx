@@ -6,6 +6,7 @@ import BannerEditor from './BannerEditor';
 import HeroVideoEditor from './HeroVideoEditor';
 import ContactEditor from './ContactEditor';
 import BioEditor from './BioEditor';
+import ShowsEditor from './ShowsEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -66,12 +67,10 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
             {activeSection === 'hero' && <HeroVideoEditor />}
             {activeSection === 'taglines' && <TaglineEditor />}
+            {activeSection === 'shows' && <ShowsEditor />}
             {activeSection === 'banner' && <BannerEditor />}
             {activeSection === 'contact' && <ContactEditor />}
             {activeSection === 'bio' && <BioEditor />}
-            {!['hero', 'taglines', 'banner', 'contact', 'bio'].includes(activeSection) && (
-              <p className="text-zinc-500">{activeSection} editor coming soon...</p>
-            )}
           </div>
         </div>
       </main>
