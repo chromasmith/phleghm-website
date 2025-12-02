@@ -8,37 +8,39 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface Show {
+interface UpcomingShow {
   id: string;
-  date: string;
+  show_date: string;
   venue: string;
   city: string;
-  ticket_link?: string | null;
-  ticket_price?: string | null;
-  notes?: string | null;
+  ticket_url?: string | null;
+}
+
+interface PastShow {
+  id: string;
+  show_date: string;
+  venue: string;
+  city: string;
   event_name?: string | null;
+  image_urls?: string[] | null;
 }
 
 type ShowType = 'upcoming' | 'past';
 
 export default function ShowsEditor() {
   const [showType, setShowType] = useState<ShowType>('upcoming');
-  const [shows, setShows] = useState<Show[]>([]);
+  const [shows, setShows] = useState<(UpcomingShow | PastShow)[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
   // New show form
   const [isAdding, setIsAdding] = useState(false);
-  const [newShow, setNewShow] = useState<Partial<Show>>({
-    date: '',
-    venue: '',
-    city: '',
-    ticket_link: '',
-    ticket_price: '',
-    notes: '',
-    event_name: ''
-  });
+  const [newDate, setNewDate] = useState('');
+  const [newVenue, setNewVenue] = useState('');
+  const [newCity, setNewCity] = useState('');
+  const [newTicketUrl, setNewTicketUrl] = useState('');
+  const [newEventName, setNewEventName] = useState('');
   
   useEffect(() => {
     fetchShows();
@@ -46,13 +48,14 @@ export default function ShowsEditor() {
   
   async function fetchShows() {
     setIsLoading(true);
+    setError('');
     const table = showType === 'upcoming' ? 'upcoming_shows' : 'past_shows';
     const order = showType === 'upcoming' ? { ascending: true } : { ascending: false };
     
     const { data, error } = await supabase
       .from(table)
       .select('*')
-      .order('date', order);
+      .order('show_date', order);
     
     if (error) {
       setError('Failed to load shows');
@@ -63,30 +66,36 @@ export default function ShowsEditor() {
   }
   
   async function addShow() {
-    if (!newShow.date || !newShow.venue || !newShow.city) {
+    if (!newDate || !newVenue || !newCity) {
       setError('Date, venue, and city are required');
       return;
     }
     
     const table = showType === 'upcoming' ? 'upcoming_shows' : 'past_shows';
     
-    const { error } = await supabase.from(table).insert({
-      date: newShow.date,
-      venue: newShow.venue,
-      city: newShow.city,
-      ticket_link: newShow.ticket_link || null,
-      ticket_price: newShow.ticket_price || null,
-      notes: newShow.notes || null,
-      event_name: newShow.event_name || null
-    });
+    let insertData: Record<string, unknown> = {
+      show_date: newDate,
+      venue: newVenue,
+      city: newCity
+    };
+    
+    if (showType === 'upcoming' && newTicketUrl) {
+      insertData.ticket_url = newTicketUrl;
+    }
+    
+    if (showType === 'past' && newEventName) {
+      insertData.event_name = newEventName;
+    }
+    
+    const { error } = await supabase.from(table).insert(insertData);
     
     if (error) {
       setError('Failed to add show');
     } else {
-      setNewShow({ date: '', venue: '', city: '', ticket_link: '', ticket_price: '', notes: '', event_name: '' });
+      resetForm();
       setIsAdding(false);
       fetchShows();
-      showSuccess('Show added!');
+      showSuccessMsg('Show added!');
     }
   }
   
@@ -100,26 +109,25 @@ export default function ShowsEditor() {
       setError('Failed to delete show');
     } else {
       fetchShows();
-      showSuccess('Show deleted');
+      showSuccessMsg('Show deleted');
     }
   }
   
-  async function updateShow(id: string, updates: Partial<Show>) {
-    const table = showType === 'upcoming' ? 'upcoming_shows' : 'past_shows';
-    const { error } = await supabase.from(table).update(updates).eq('id', id);
-    
-    if (error) {
-      setError('Failed to update show');
-    }
+  function resetForm() {
+    setNewDate('');
+    setNewVenue('');
+    setNewCity('');
+    setNewTicketUrl('');
+    setNewEventName('');
   }
   
-  function showSuccess(msg: string) {
+  function showSuccessMsg(msg: string) {
     setSuccess(msg);
     setTimeout(() => setSuccess(''), 2000);
   }
   
   function formatDate(dateStr: string) {
-    const date = new Date(dateStr);
+    const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
   
@@ -141,7 +149,7 @@ export default function ShowsEditor() {
       {/* Toggle */}
       <div className="flex gap-2">
         <button
-          onClick={() => setShowType('upcoming')}
+          onClick={() => { setShowType('upcoming'); setIsAdding(false); }}
           className={`flex-1 py-2 text-sm font-medium rounded transition-colors ${
             showType === 'upcoming'
               ? 'bg-green-500 text-black'
@@ -151,7 +159,7 @@ export default function ShowsEditor() {
           UPCOMING
         </button>
         <button
-          onClick={() => setShowType('past')}
+          onClick={() => { setShowType('past'); setIsAdding(false); }}
           className={`flex-1 py-2 text-sm font-medium rounded transition-colors ${
             showType === 'past'
               ? 'bg-green-500 text-black'
@@ -175,24 +183,22 @@ export default function ShowsEditor() {
       {/* Add Form */}
       {isAdding && (
         <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-3">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="block text-xs text-zinc-500 mb-1">Date *</label>
-              <input
-                type="date"
-                value={newShow.date}
-                onChange={(e) => setNewShow({ ...newShow, date: e.target.value })}
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm"
-              />
-            </div>
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Date *</label>
+            <input
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm"
+            />
           </div>
           
           <div>
             <label className="block text-xs text-zinc-500 mb-1">Venue *</label>
             <input
               type="text"
-              value={newShow.venue}
-              onChange={(e) => setNewShow({ ...newShow, venue: e.target.value })}
+              value={newVenue}
+              onChange={(e) => setNewVenue(e.target.value)}
               placeholder="The Crocodile"
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
             />
@@ -202,36 +208,24 @@ export default function ShowsEditor() {
             <label className="block text-xs text-zinc-500 mb-1">City *</label>
             <input
               type="text"
-              value={newShow.city}
-              onChange={(e) => setNewShow({ ...newShow, city: e.target.value })}
+              value={newCity}
+              onChange={(e) => setNewCity(e.target.value)}
               placeholder="Seattle, WA"
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
             />
           </div>
           
           {showType === 'upcoming' && (
-            <>
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1">Ticket Link</label>
-                <input
-                  type="url"
-                  value={newShow.ticket_link || ''}
-                  onChange={(e) => setNewShow({ ...newShow, ticket_link: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1">Ticket Price</label>
-                <input
-                  type="text"
-                  value={newShow.ticket_price || ''}
-                  onChange={(e) => setNewShow({ ...newShow, ticket_price: e.target.value })}
-                  placeholder="$15 / $20 door"
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-                />
-              </div>
-            </>
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">Ticket URL</label>
+              <input
+                type="url"
+                value={newTicketUrl}
+                onChange={(e) => setNewTicketUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
+              />
+            </div>
           )}
           
           {showType === 'past' && (
@@ -239,28 +233,17 @@ export default function ShowsEditor() {
               <label className="block text-xs text-zinc-500 mb-1">Event Name</label>
               <input
                 type="text"
-                value={newShow.event_name || ''}
-                onChange={(e) => setNewShow({ ...newShow, event_name: e.target.value })}
+                value={newEventName}
+                onChange={(e) => setNewEventName(e.target.value)}
                 placeholder="Underground Fridays"
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
               />
             </div>
           )}
           
-          <div>
-            <label className="block text-xs text-zinc-500 mb-1">Notes</label>
-            <input
-              type="text"
-              value={newShow.notes || ''}
-              onChange={(e) => setNewShow({ ...newShow, notes: e.target.value })}
-              placeholder="All ages, 21+ bar"
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-            />
-          </div>
-          
           <div className="flex gap-2 pt-2">
             <button
-              onClick={() => setIsAdding(false)}
+              onClick={() => { setIsAdding(false); resetForm(); }}
               className="flex-1 py-2 bg-zinc-700 text-white text-sm font-medium rounded"
             >
               CANCEL
@@ -289,14 +272,16 @@ export default function ShowsEditor() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="text-green-500 text-sm font-medium">{formatDate(show.date)}</div>
+                  <div className="text-green-500 text-sm font-medium">{formatDate(show.show_date)}</div>
                   <div className="text-white font-medium truncate">{show.venue}</div>
                   <div className="text-zinc-500 text-sm">{show.city}</div>
-                  {show.event_name && (
+                  {'event_name' in show && show.event_name && (
                     <div className="text-xs text-green-500 mt-1">{show.event_name}</div>
                   )}
-                  {show.notes && (
-                    <div className="text-xs text-zinc-500 mt-1">{show.notes}</div>
+                  {'ticket_url' in show && show.ticket_url && (
+                    <a href={show.ticket_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 mt-1 block truncate hover:underline">
+                      {show.ticket_url}
+                    </a>
                   )}
                 </div>
                 <button
