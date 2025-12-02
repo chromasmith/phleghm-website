@@ -34,22 +34,21 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
           </button>
         </div>
         
-        {/* Mobile Nav - Horizontal Scroll */}
-        <nav className="flex overflow-x-auto border-t border-zinc-800">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveSection(item.id)}
-              className={`flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors ${
-                activeSection === item.id
-                  ? 'text-green-500 border-b-2 border-green-500'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
+        {/* Section Dropdown */}
+        <div className="px-4 py-3 border-t border-zinc-800">
+          <label className="block text-xs text-zinc-500 mb-1">Edit</label>
+          <select
+            value={activeSection}
+            onChange={(e) => setActiveSection(e.target.value)}
+            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-green-500"
+          >
+            {NAV_ITEMS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
       
       {/* Content Area */}
