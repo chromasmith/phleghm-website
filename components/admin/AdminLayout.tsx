@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import TaglineEditor from './TaglineEditor';
+import BannerEditor from './BannerEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -59,7 +60,8 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
           </h2>
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
             {activeSection === 'taglines' && <TaglineEditor />}
-            {activeSection !== 'taglines' && (
+            {activeSection === 'banner' && <BannerEditor />}
+            {!['taglines', 'banner'].includes(activeSection) && (
               <p className="text-zinc-500">{activeSection} editor coming soon...</p>
             )}
           </div>
