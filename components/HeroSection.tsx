@@ -20,6 +20,12 @@ const FALLBACK_TAGLINES = [
   'SURREAL. SICK. SHARP.',
 ];
 
+// Fallback hero video URLs
+const FALLBACK_HERO_URLS = {
+  desktop: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_H.mp4',
+  mobile: 'https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4',
+};
+
 const titleLetters = ['P', 'H', 'L', 'E', 'G', 'M'];
 
 interface HeroSectionProps {
@@ -38,7 +44,37 @@ export default function HeroSection({ content }: HeroSectionProps) {
   const [taglinesLoaded, setTaglinesLoaded] = useState(false);
   const [visibleSplatters, setVisibleSplatters] = useState<Set<number>>(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
   const [splatterGlitch, setSplatterGlitch] = useState(false);
+  const [heroUrls, setHeroUrls] = useState(FALLBACK_HERO_URLS);
   const jitterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch hero video URLs from site_settings
+  useEffect(() => {
+    async function fetchHeroUrls() {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('key, value')
+        .in('key', ['hero_desktop_url', 'hero_mobile_url']);
+      
+      if (error) {
+        console.error('Error fetching hero URLs:', error);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        const urls = { ...FALLBACK_HERO_URLS };
+        data.forEach((setting) => {
+          if (setting.key === 'hero_desktop_url' && setting.value) {
+            urls.desktop = setting.value;
+          }
+          if (setting.key === 'hero_mobile_url' && setting.value) {
+            urls.mobile = setting.value;
+          }
+        });
+        setHeroUrls(urls);
+      }
+    }
+    fetchHeroUrls();
+  }, []);
 
   // Fetch taglines from Supabase
   useEffect(() => {
@@ -216,7 +252,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
         playsInline
         className="absolute inset-0 w-full h-full object-cover hidden md:block"
       >
-        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_H.mp4" type="video/mp4" />
+        <source src={heroUrls.desktop} type="video/mp4" />
       </video>
       
       {/* Mobile video (vertical) */}
@@ -227,7 +263,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
         playsInline
         className="absolute inset-0 w-full h-full object-cover md:hidden"
       >
-        <source src="https://chromasmith-cdn.b-cdn.net/phleghm-website/hero/Veteran_V.mp4" type="video/mp4" />
+        <source src={heroUrls.mobile} type="video/mp4" />
       </video>
       
       {/* Scanlines overlay - increased intensity */}
