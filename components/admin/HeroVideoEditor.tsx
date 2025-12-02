@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import MediaUploader from './MediaUploader';
+import BunnyFilePicker from './BunnyFilePicker';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,6 +29,7 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPicker, setShowPicker] = useState(false);
   
   useEffect(() => {
     fetchVideo();
@@ -91,6 +93,11 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
     setUrl(newUrl);
     saveVideo(newUrl);
   }
+
+  function handlePickerSelect(selectedUrl: string) {
+    setUrl(selectedUrl);
+    saveVideo(selectedUrl);
+  }
   
   if (isLoading) {
     return (
@@ -114,6 +121,7 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       {/* Preview */}
       {url && (
         <video
+          key={url}
           src={url}
           className={`${previewClass} rounded border border-zinc-700`}
           muted
@@ -133,21 +141,35 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       />
       
       {/* Actions */}
-      <div className="flex gap-2 items-start">
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setShowPicker(true)}
+          className="px-4 py-2 bg-zinc-700 text-white text-sm font-medium rounded border border-zinc-600 hover:bg-zinc-600 transition-colors"
+        >
+          Browse Library
+        </button>
         <MediaUploader
           onUploadComplete={handleUploadComplete}
           folder="phleghm-website/hero"
           accept="video/*"
-          label="Upload"
+          label="Upload New"
         />
         <button
           onClick={() => saveVideo()}
           disabled={isSaving}
-          className="px-4 py-2 bg-green-500 text-black text-sm font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-[#00ff41] text-black text-sm font-bold rounded hover:bg-[#00dd35] disabled:opacity-50 transition-colors"
         >
           {isSaving ? 'SAVING...' : 'SAVE'}
         </button>
       </div>
+
+      <BunnyFilePicker
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelect={handlePickerSelect}
+        folder="phleghm-website/hero"
+        filterType="video"
+      />
     </div>
   );
 }
