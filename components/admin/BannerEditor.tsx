@@ -104,6 +104,7 @@ export default function BannerEditor() {
         <div>
           <div className="font-medium text-white">Show Banner</div>
           <div className="text-sm text-zinc-500">Display banner on the website</div>
+          <div className="text-xs text-zinc-600 mt-1">requires save</div>
         </div>
         <button
           onClick={() => updateField('enabled', !banner.enabled)}
