@@ -11,13 +11,7 @@ const supabase = createClient(
 interface BioContent {
   id: string;
   hero_video_url: string | null;
-  hero_video_width: number;
-  hero_video_height: number;
-  title: string | null;
-  tagline: string | null;
   bio_text: string | null;
-  speaks_in_items: string[] | null;
-  closing_text: string | null;
 }
 
 export default function BioEditor() {
@@ -52,14 +46,7 @@ export default function BioEditor() {
     const { error } = await supabase
       .from('bio_content')
       .update({
-        hero_video_url: bio.hero_video_url,
-        hero_video_width: bio.hero_video_width,
-        hero_video_height: bio.hero_video_height,
-        title: bio.title,
-        tagline: bio.tagline,
         bio_text: bio.bio_text,
-        speaks_in_items: bio.speaks_in_items,
-        closing_text: bio.closing_text,
         updated_at: new Date().toISOString()
       })
       .eq('id', bio.id);
@@ -71,10 +58,6 @@ export default function BioEditor() {
       setTimeout(() => setSuccess(''), 2000);
     }
     setIsSaving(false);
-  }
-  
-  function handleUploadClick() {
-    alert('Direct upload coming soon. For now, upload to Bunny CDN and paste the URL.');
   }
   
   if (isLoading) {
@@ -100,9 +83,12 @@ export default function BioEditor() {
         </div>
       )}
       
-      {/* Video Section */}
-      <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-4">
-        <h3 className="font-medium text-white">Bio Video</h3>
+      {/* Video Section - Under Construction */}
+      <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-4 opacity-60">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium text-white">Bio Video</h3>
+          <span className="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">UNDER CONSTRUCTION</span>
+        </div>
         
         {bio.hero_video_url && (
           <video
@@ -115,111 +101,29 @@ export default function BioEditor() {
           />
         )}
         
-        <input
-          type="url"
-          value={bio.hero_video_url || ''}
-          onChange={(e) => setBio({ ...bio, hero_video_url: e.target.value })}
-          placeholder="https://chromasmith-cdn.b-cdn.net/..."
-          className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-        />
-        
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-xs text-zinc-500 mb-1">Width</label>
-            <input
-              type="number"
-              value={bio.hero_video_width}
-              onChange={(e) => setBio({ ...bio, hero_video_width: parseInt(e.target.value) || 576 })}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs text-zinc-500 mb-1">Height</label>
-            <input
-              type="number"
-              value={bio.hero_video_height}
-              onChange={(e) => setBio({ ...bio, hero_video_height: parseInt(e.target.value) || 758 })}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm"
-            />
-          </div>
-        </div>
-        
-        <button
-          onClick={handleUploadClick}
-          className="w-full py-2 bg-zinc-700 text-white text-sm font-medium rounded hover:bg-zinc-600"
-        >
-          UPLOAD VIDEO
-        </button>
+        <p className="text-xs text-zinc-500">Video upload coming soon.</p>
       </div>
       
-      {/* Text Content Section */}
+      {/* Bio Text Section */}
       <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-4">
         <h3 className="font-medium text-white">Bio Text</h3>
         
-        <div>
-          <label className="block text-xs text-zinc-500 mb-1">Title</label>
-          <input
-            type="text"
-            value={bio.title || ''}
-            onChange={(e) => setBio({ ...bio, title: e.target.value })}
-            placeholder="PHLEGM"
-            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-          />
-        </div>
+        <textarea
+          value={bio.bio_text || ''}
+          onChange={(e) => setBio({ ...bio, bio_text: e.target.value })}
+          placeholder="Enter bio text..."
+          rows={12}
+          className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm resize-none"
+        />
         
-        <div>
-          <label className="block text-xs text-zinc-500 mb-1">Tagline</label>
-          <input
-            type="text"
-            value={bio.tagline || ''}
-            onChange={(e) => setBio({ ...bio, tagline: e.target.value })}
-            placeholder="Seattle Underground"
-            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-xs text-zinc-500 mb-1">Bio Text (separate paragraphs with blank lines)</label>
-          <textarea
-            value={bio.bio_text || ''}
-            onChange={(e) => setBio({ ...bio, bio_text: e.target.value })}
-            placeholder="Main bio text..."
-            rows={6}
-            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm resize-none"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-xs text-zinc-500 mb-1">Speaks In (comma separated)</label>
-          <input
-            type="text"
-            value={bio.speaks_in_items?.join(', ') || ''}
-            onChange={(e) => setBio({ ...bio, speaks_in_items: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-            placeholder="grit, bars, punchlines"
-            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-xs text-zinc-500 mb-1">Closing Text</label>
-          <textarea
-            value={bio.closing_text || ''}
-            onChange={(e) => setBio({ ...bio, closing_text: e.target.value })}
-            placeholder="Closing statement..."
-            rows={3}
-            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white placeholder-zinc-500 text-sm resize-none"
-          />
-        </div>
+        <button
+          onClick={saveBio}
+          disabled={isSaving}
+          className="w-full py-3 bg-green-500 text-black font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
+        >
+          {isSaving ? 'SAVING...' : 'SAVE BIO'}
+        </button>
       </div>
-      
-      {/* Save Button */}
-      <button
-        onClick={saveBio}
-        disabled={isSaving}
-        className="w-full py-3 bg-green-500 text-black font-bold rounded hover:bg-green-400 disabled:opacity-50 transition-colors"
-      >
-        {isSaving ? 'SAVING...' : 'SAVE BIO'}
-      </button>
     </div>
   );
 }
