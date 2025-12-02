@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import TaglineEditor from './TaglineEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -57,9 +58,10 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
             {NAV_ITEMS.find(item => item.id === activeSection)?.label}
           </h2>
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-            <p className="text-zinc-500">
-              {activeSection} editor coming soon...
-            </p>
+            {activeSection === 'taglines' && <TaglineEditor />}
+            {activeSection !== 'taglines' && (
+              <p className="text-zinc-500">{activeSection} editor coming soon...</p>
+            )}
           </div>
         </div>
       </main>
