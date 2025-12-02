@@ -141,10 +141,10 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       />
       
       {/* Actions */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-stretch">
         <button
           onClick={() => setShowPicker(true)}
-          className="px-4 py-2 bg-zinc-700 text-white text-sm font-medium rounded border border-zinc-600 hover:bg-zinc-600 transition-colors"
+          className="px-4 py-2 bg-zinc-700 text-white text-sm rounded border border-zinc-600 hover:bg-zinc-600 transition-colors"
         >
           Browse Library
         </button>
@@ -157,9 +157,9 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
         <button
           onClick={() => saveVideo()}
           disabled={isSaving}
-          className="px-4 py-2 bg-[#00ff41] text-black text-sm font-bold rounded hover:bg-[#00dd35] disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-[#00ff41] text-black text-sm rounded border border-[#00ff41] hover:bg-[#00dd35] disabled:opacity-50 transition-colors"
         >
-          {isSaving ? 'SAVING...' : 'SAVE'}
+          {isSaving ? 'Saving...' : 'Save'}
         </button>
       </div>
 
