@@ -25,7 +25,7 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-zinc-900 border-b border-zinc-800">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold text-green-500">PHLEGM Admin</h1>
+          <h1 className="text-lg font-bold text-green-500">PHLEGM Admin Dashboard</h1>
           <button
             onClick={onLogout}
             className="text-sm text-zinc-400 hover:text-white transition-colors"
@@ -35,19 +35,22 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
         </div>
         
         {/* Section Dropdown */}
-        <div className="px-4 py-3 border-t border-zinc-800">
-          <label className="block text-xs text-zinc-500 mb-1">Edit</label>
-          <select
-            value={activeSection}
-            onChange={(e) => setActiveSection(e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-green-500"
-          >
-            {NAV_ITEMS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-end gap-3 px-4 py-3 border-t border-zinc-800">
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Edit</label>
+            <select
+              value={activeSection}
+              onChange={(e) => setActiveSection(e.target.value)}
+              className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-green-500"
+            >
+              {NAV_ITEMS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Future buttons go here */}
         </div>
       </header>
       
