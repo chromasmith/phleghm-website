@@ -63,11 +63,11 @@ export default function HeroSection({ content }: HeroSectionProps) {
       if (data && data.length > 0) {
         const urls = { ...FALLBACK_HERO_URLS };
         data.forEach((setting) => {
-          if (setting.key === 'hero_desktop_url' && setting.value) {
-            urls.desktop = setting.value;
+          if (setting.key === 'hero_desktop_url' && setting.value?.url) {
+            urls.desktop = setting.value.url;
           }
-          if (setting.key === 'hero_mobile_url' && setting.value) {
-            urls.mobile = setting.value;
+          if (setting.key === 'hero_mobile_url' && setting.value?.url) {
+            urls.mobile = setting.value.url;
           }
         });
         setHeroUrls(urls);
