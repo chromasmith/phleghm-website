@@ -102,8 +102,8 @@ export default function MediaUploader({
         htmlFor="media-upload"
         className={`inline-flex items-center gap-2 px-4 py-2 rounded cursor-pointer transition-colors ${
           uploading 
-            ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed' 
-            : 'bg-[#00ff41] text-black hover:bg-[#00dd35]'
+            ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed border border-zinc-600' 
+            : 'bg-zinc-700 text-white border border-zinc-600 hover:bg-zinc-600'
         }`}
       >
         {buttonContent}
