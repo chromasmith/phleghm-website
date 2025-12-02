@@ -20,8 +20,6 @@ interface BioContent {
   title: string;
   tagline: string;
   bio_text: string;
-  speaks_in_items: string[];
-  closing_text: string;
 }
 
 // Fallback config in case database fetch fails
@@ -32,8 +30,6 @@ const FALLBACK_CONFIG = {
   title: 'PHLEGM',
   tagline: 'Rain. Static. The space between.',
   bio_text: '',
-  speaks_in_items: [],
-  closing_text: '',
 };
 
 export default function BioModal({ isOpen, onClose }: BioModalProps) {
@@ -66,8 +62,6 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
           title: data.title || 'PHLEGM',
           tagline: data.tagline || '',
           bio_text: data.bio_text || '',
-          speaks_in_items: data.speaks_in_items || [],
-          closing_text: data.closing_text || '',
         });
       }
 
@@ -81,9 +75,8 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
 
   const aspectRatio = bio.hero_video_width / bio.hero_video_height;
 
-  // Split bio_text into paragraphs
+  // Split bio_text into paragraphs on double newlines
   const bioParagraphs = bio.bio_text.split('\n\n').filter(p => p.trim());
-  const closingParagraphs = bio.closing_text.split('\n\n').filter(p => p.trim());
 
   // Shared close button component
   const CloseButtonBottom = () => (
@@ -147,23 +140,6 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                   {bioParagraphs.map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
-
-                  {bio.speaks_in_items.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-2">He speaks in:</p>
-                      <ul className="space-y-1 text-zinc-400 text-sm">
-                        {bio.speaks_in_items.map((item, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <span className="text-[#00ff41]">•</span> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {closingParagraphs.map((paragraph, index) => (
-                    <p key={index} className="mt-4">{paragraph}</p>
-                  ))}
                 </div>
 
                 <CloseButtonBottom />
@@ -213,23 +189,6 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 <div className="text-zinc-300 font-mono text-base lg:text-lg leading-relaxed space-y-5">
                   {bioParagraphs.map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
-                  ))}
-
-                  {bio.speaks_in_items.length > 0 && (
-                    <div className="mt-8">
-                      <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-3">He speaks in:</p>
-                      <ul className="space-y-2 text-zinc-400">
-                        {bio.speaks_in_items.map((item, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <span className="text-[#00ff41]">•</span> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {closingParagraphs.map((paragraph, index) => (
-                    <p key={index} className="mt-8">{paragraph}</p>
                   ))}
                 </div>
 
