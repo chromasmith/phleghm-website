@@ -100,7 +100,7 @@ export default function MediaUploader({
       
       <label
         htmlFor="media-upload"
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded cursor-pointer transition-colors ${
+        className={`inline-flex items-center h-[38px] gap-2 px-4 text-sm rounded cursor-pointer transition-colors ${
           uploading 
             ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed border border-zinc-600' 
             : 'bg-zinc-700 text-white border border-zinc-600 hover:bg-zinc-600'
