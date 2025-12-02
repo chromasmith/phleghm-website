@@ -246,6 +246,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Desktop video (horizontal) */}
       <video
+        key={heroUrls.desktop}
         autoPlay
         muted
         loop
@@ -257,6 +258,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
       
       {/* Mobile video (vertical) */}
       <video
+        key={heroUrls.mobile}
         autoPlay
         muted
         loop
