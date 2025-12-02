@@ -103,10 +103,15 @@ export default function ContactEditor() {
     }
   }
   
-  async function setPrimary(id: string) {
-    // Clear all primary flags, then set the new one
-    await supabase.from('social_links').update({ is_primary: false }).neq('id', '');
-    await supabase.from('social_links').update({ is_primary: true }).eq('id', id);
+  async function togglePrimary(id: string, currentlyPrimary: boolean) {
+    if (currentlyPrimary) {
+      // Turn off primary
+      await supabase.from('social_links').update({ is_primary: false }).eq('id', id);
+    } else {
+      // Clear all, then set new primary
+      await supabase.from('social_links').update({ is_primary: false }).neq('id', '');
+      await supabase.from('social_links').update({ is_primary: true }).eq('id', id);
+    }
     fetchData();
     showSuccess('Primary updated');
   }
@@ -210,7 +215,7 @@ export default function ContactEditor() {
                 className="flex-1 px-2 py-1 bg-transparent text-white text-sm focus:outline-none"
               />
               <button
-                onClick={() => setPrimary(link.id)}
+                onClick={() => togglePrimary(link.id, link.is_primary)}
                 className={`text-xs px-2 py-1 rounded ${
                   link.is_primary
                     ? 'bg-green-500 text-black'
