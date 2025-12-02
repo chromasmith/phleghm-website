@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import TaglineEditor from './TaglineEditor';
 import BannerEditor from './BannerEditor';
+import HeroVideoEditor from './HeroVideoEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -61,9 +62,10 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
             {NAV_ITEMS.find(item => item.id === activeSection)?.label}
           </h2>
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+            {activeSection === 'hero' && <HeroVideoEditor />}
             {activeSection === 'taglines' && <TaglineEditor />}
             {activeSection === 'banner' && <BannerEditor />}
-            {!['taglines', 'banner'].includes(activeSection) && (
+            {!['hero', 'taglines', 'banner'].includes(activeSection) && (
               <p className="text-zinc-500">{activeSection} editor coming soon...</p>
             )}
           </div>
