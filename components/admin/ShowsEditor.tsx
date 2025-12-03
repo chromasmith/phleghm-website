@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import MediaUploader from './MediaUploader';
+import BunnyFilePicker from './BunnyFilePicker';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,6 +43,10 @@ export default function ShowsEditor() {
   const [newCity, setNewCity] = useState('');
   const [newTicketUrl, setNewTicketUrl] = useState('');
   const [newEventName, setNewEventName] = useState('');
+  
+  // Media upload state
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   
   useEffect(() => {
     fetchShows();
@@ -83,8 +89,13 @@ export default function ShowsEditor() {
       insertData.ticket_url = newTicketUrl;
     }
     
-    if (showType === 'past' && newEventName) {
-      insertData.event_name = newEventName;
+    if (showType === 'past') {
+      if (newEventName) {
+        insertData.event_name = newEventName;
+      }
+      if (mediaUrls.length > 0) {
+        insertData.image_urls = mediaUrls;
+      }
     }
     
     const { error } = await supabase.from(table).insert(insertData);
@@ -119,6 +130,7 @@ export default function ShowsEditor() {
     setNewCity('');
     setNewTicketUrl('');
     setNewEventName('');
+    setMediaUrls([]);
   }
   
   function showSuccessMsg(msg: string) {
@@ -129,6 +141,27 @@ export default function ShowsEditor() {
   function formatDate(dateStr: string) {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  
+  function handleMediaSelect(url: string) {
+    if (!mediaUrls.includes(url)) {
+      setMediaUrls([...mediaUrls, url]);
+    }
+    setShowMediaPicker(false);
+  }
+  
+  function handleMediaUpload(url: string) {
+    if (!mediaUrls.includes(url)) {
+      setMediaUrls([...mediaUrls, url]);
+    }
+  }
+  
+  function removeMedia(url: string) {
+    setMediaUrls(mediaUrls.filter(u => u !== url));
+  }
+  
+  function isVideo(url: string) {
+    return /\.(mp4|webm|mov|avi)$/i.test(url);
   }
   
   return (
@@ -185,12 +218,22 @@ export default function ShowsEditor() {
         <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 space-y-3">
           <div>
             <label className="block text-xs text-zinc-500 mb-1">Date *</label>
-            <input
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm"
-            />
+            <div className="relative">
+              <input
+                type="date"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="w-full px-3 py-2 pr-10 bg-zinc-900 border border-zinc-700 rounded text-white text-sm [color-scheme:dark]"
+              />
+              <svg 
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white pointer-events-none" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
           </div>
           
           <div>
@@ -241,6 +284,67 @@ export default function ShowsEditor() {
             </div>
           )}
           
+          {/* Media Upload Section */}
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Photos & Videos</label>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={() => setShowMediaPicker(true)}
+                className="flex-1 py-2 px-3 bg-zinc-700 text-white text-sm font-medium rounded hover:bg-zinc-600 flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Browse Library
+              </button>
+              <MediaUploader
+                folder="phleghm-website/shows/"
+                accept="image/*,video/*"
+                onUpload={handleMediaUpload}
+                buttonText="Upload New"
+                buttonClassName="flex-1 py-2 px-3 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-500 flex items-center justify-center gap-2"
+              />
+            </div>
+            
+            {/* Media Thumbnails */}
+            {mediaUrls.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+                {mediaUrls.map((url, idx) => (
+                  <div key={idx} className="relative group aspect-square bg-zinc-900 rounded overflow-hidden">
+                    {isVideo(url) ? (
+                      <video 
+                        src={url} 
+                        className="w-full h-full object-cover"
+                        muted
+                      />
+                    ) : (
+                      <img 
+                        src={url} 
+                        alt={`Media ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeMedia(url)}
+                      className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    {isVideo(url) && (
+                      <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1 rounded">
+                        VIDEO
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
           <div className="flex gap-2 pt-2">
             <button
               onClick={() => { setIsAdding(false); resetForm(); }}
@@ -256,6 +360,16 @@ export default function ShowsEditor() {
             </button>
           </div>
         </div>
+      )}
+      
+      {/* BunnyFilePicker Modal */}
+      {showMediaPicker && (
+        <BunnyFilePicker
+          folder="phleghm-website/shows/"
+          accept="image/*,video/*"
+          onSelect={handleMediaSelect}
+          onClose={() => setShowMediaPicker(false)}
+        />
       )}
       
       {/* Shows List */}
@@ -282,6 +396,24 @@ export default function ShowsEditor() {
                     <a href={show.ticket_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 mt-1 block truncate hover:underline">
                       {show.ticket_url}
                     </a>
+                  )}
+                  {'image_urls' in show && show.image_urls && show.image_urls.length > 0 && (
+                    <div className="flex gap-1 mt-2 overflow-x-auto">
+                      {show.image_urls.slice(0, 4).map((url, idx) => (
+                        <div key={idx} className="w-12 h-12 flex-shrink-0 bg-zinc-900 rounded overflow-hidden">
+                          {isVideo(url) ? (
+                            <video src={url} className="w-full h-full object-cover" muted />
+                          ) : (
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                      ))}
+                      {show.image_urls.length > 4 && (
+                        <div className="w-12 h-12 flex-shrink-0 bg-zinc-900 rounded flex items-center justify-center text-xs text-zinc-400">
+                          +{show.image_urls.length - 4}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
                 <button
