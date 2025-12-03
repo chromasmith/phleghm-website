@@ -7,13 +7,15 @@ interface MediaUploaderProps {
   folder?: string;
   accept?: string;
   label?: string;
+  className?: string;
 }
 
 export default function MediaUploader({ 
   onUploadComplete, 
   folder = 'phleghm-website',
   accept = 'video/*,image/*',
-  label = 'Upload Media'
+  label = 'Upload Media',
+  className
 }: MediaUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -87,7 +89,7 @@ export default function MediaUploader({
   );
 
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${className || ''}`}>
       <input
         ref={fileInputRef}
         type="file"
