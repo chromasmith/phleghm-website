@@ -90,7 +90,7 @@ export default function MediaUploader({
         type="button"
         onClick={handleButtonClick}
         disabled={uploading}
-        className={`h-10 px-4 text-sm font-medium inline-flex items-center justify-center gap-2 border border-zinc-600 hover:bg-zinc-700 text-white rounded transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''} ${className || ''}`}
+        className={`h-10 px-4 text-sm font-medium inline-flex items-center justify-center gap-2 bg-zinc-700 border border-zinc-600 hover:bg-zinc-600 text-white rounded transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''} ${className || ''}`}
       >
         {uploading ? (
           <>
