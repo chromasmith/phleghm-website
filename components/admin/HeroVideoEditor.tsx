@@ -141,10 +141,10 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
       />
       
       {/* Actions */}
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex items-center gap-3 mt-3">
         <button
           onClick={() => setShowPicker(true)}
-          className="h-[38px] px-4 bg-zinc-700 text-white text-sm rounded border border-zinc-600 hover:bg-zinc-600 transition-colors"
+          className="h-10 px-4 text-sm font-medium inline-flex items-center justify-center gap-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
         >
           Browse Library
         </button>
@@ -153,11 +153,12 @@ function VideoCard({ label, aspect, videoKey, previewClass }: VideoCardProps) {
           folder="phleghm-website/hero"
           accept="video/*"
           label="Upload New"
+          className="h-10 px-4 text-sm font-medium inline-flex items-center justify-center gap-2 border border-zinc-600 hover:bg-zinc-700 text-white rounded transition-colors"
         />
         <button
           onClick={() => saveVideo()}
           disabled={isSaving}
-          className="h-[38px] px-4 bg-[#00ff41] text-black text-sm rounded border border-[#00ff41] hover:bg-[#00dd35] disabled:opacity-50 transition-colors"
+          className="h-10 px-4 text-sm font-medium inline-flex items-center justify-center gap-2 bg-[#00ff41] hover:bg-[#00dd38] text-black rounded transition-colors disabled:opacity-50"
         >
           {isSaving ? 'Saving...' : 'Save'}
         </button>
