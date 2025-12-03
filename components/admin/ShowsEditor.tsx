@@ -363,14 +363,12 @@ export default function ShowsEditor() {
       )}
       
       {/* BunnyFilePicker Modal */}
-      {showMediaPicker && (
-        <BunnyFilePicker
-          folder="phleghm-website/shows/"
-          accept="image/*,video/*"
-          onSelect={handleMediaSelect}
-          onClose={() => setShowMediaPicker(false)}
-        />
-      )}
+      <BunnyFilePicker
+        isOpen={showMediaPicker}
+        folder="phleghm-website/shows/"
+        onSelect={handleMediaSelect}
+        onClose={() => setShowMediaPicker(false)}
+      />
       
       {/* Shows List */}
       {isLoading ? (
