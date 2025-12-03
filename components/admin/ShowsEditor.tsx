@@ -301,9 +301,9 @@ export default function ShowsEditor() {
               <MediaUploader
                 folder="phleghm-website/shows/"
                 accept="image/*,video/*"
-                onUpload={handleMediaUpload}
-                buttonText="Upload New"
-                buttonClassName="flex-1 py-2 px-3 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-500 flex items-center justify-center gap-2"
+                onUploadComplete={handleMediaUpload}
+                label="Upload New"
+                className="flex-1"
               />
             </div>
             
