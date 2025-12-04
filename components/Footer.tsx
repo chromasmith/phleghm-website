@@ -14,7 +14,7 @@ export default function Footer() {
           className="cursor-pointer hover:opacity-80 transition-opacity text-center bg-transparent border-none"
         >
           <div className="font-headline text-4xl tracking-wide opacity-20">
-            PHLEGM<span className="text-[0.6em]">®</span>
+            PHLEGM<span className="text-[0.6em] align-super">®</span>
           </div>
           <div className="font-body text-zinc-700 text-xs mt-4">
             © {new Date().getFullYear()} PHLEGM. SEATTLE UNDERGROUND.
