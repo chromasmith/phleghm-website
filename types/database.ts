@@ -8,6 +8,8 @@ export interface HeroContent {
 export interface UpcomingShow {
   id: string;
   show_date: string;
+  show_time: string | null;
+  event_name: string | null;
   venue: string;
   city: string;
   ticket_url: string | null;
