@@ -33,8 +33,9 @@ export default function ShowsEditor() {
   const [city, setCity] = useState('');
   const [ticketUrl, setTicketUrl] = useState('');
   
-  // Ref for date input
+  // Refs for date and time inputs
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const timeInputRef = useRef<HTMLInputElement>(null);
   
   // Track if form is visible (for new shows or editing)
   const [formVisible, setFormVisible] = useState(false);
@@ -240,12 +241,24 @@ export default function ShowsEditor() {
           
           <div>
             <label className="block text-xs text-zinc-500 mb-1">Time</label>
-            <input
-              type="time"
-              value={showTime}
-              onChange={(e) => setShowTime(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm [color-scheme:dark]"
-            />
+            <div className="flex">
+              <button
+                type="button"
+                onClick={() => timeInputRef.current?.showPicker()}
+                className="px-3 py-2 bg-zinc-900 border border-zinc-700 border-r-0 rounded-l text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <input
+                ref={timeInputRef}
+                type="time"
+                value={showTime}
+                onChange={(e) => setShowTime(e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-r text-white text-sm [color-scheme:dark]"
+              />
+            </div>
           </div>
           
           <div>
