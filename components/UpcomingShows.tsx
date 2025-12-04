@@ -42,7 +42,7 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                   <div className="col-start-2 row-start-1 row-span-2 self-start justify-self-end md:order-3 md:flex-1 md:self-auto md:justify-self-auto">
                     <h3 
                       className="font-headline text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-bold tracking-wider text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left leading-tight"
-                      style={{ letterSpacing: '0.05em' }}
+                      style={{ letterSpacing: '0.02em' }}
                     >
                       {show.event_name}
                     </h3>
@@ -54,7 +54,7 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 <div className="col-start-1 row-start-1 md:order-1 md:w-24 md:shrink-0">
                   <span 
                     className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-widest block"
-                    style={{ letterSpacing: '0.05em' }}
+                    style={{ letterSpacing: '0.02em' }}
                   >
                     {monthDay}
                   </span>
@@ -70,7 +70,7 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 <div className="col-start-1 row-start-3 self-end md:order-2 md:w-44 md:shrink-0 md:self-auto">
                   <h3 
                     className="font-headline text-lg sm:text-xl md:text-2xl tracking-wider text-white group-hover:text-[#00ff41] transition-colors"
-                    style={{ letterSpacing: '0.05em' }}
+                    style={{ letterSpacing: '0.02em' }}
                   >
                     {show.venue}
                   </h3>
