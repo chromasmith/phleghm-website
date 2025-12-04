@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -11,6 +11,7 @@ const supabase = createClient(
 interface UpcomingShow {
   id: string;
   show_date: string;
+  show_time?: string | null;
   venue: string;
   city: string;
   ticket_url?: string | null;
@@ -27,9 +28,13 @@ export default function ShowsEditor() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [eventName, setEventName] = useState('');
   const [date, setDate] = useState('');
+  const [showTime, setShowTime] = useState('');
   const [venue, setVenue] = useState('');
   const [city, setCity] = useState('');
   const [ticketUrl, setTicketUrl] = useState('');
+  
+  // Ref for date input
+  const dateInputRef = useRef<HTMLInputElement>(null);
   
   // Track if form is visible (for new shows or editing)
   const [formVisible, setFormVisible] = useState(false);
@@ -63,6 +68,7 @@ export default function ShowsEditor() {
     
     const showData: Record<string, unknown> = {
       show_date: date,
+      show_time: showTime || null,
       venue: venue,
       city: city,
       event_name: eventName || null,
@@ -123,6 +129,7 @@ export default function ShowsEditor() {
     setEditingId(show.id);
     setEventName(show.event_name || '');
     setDate(show.show_date);
+    setShowTime(show.show_time || '');
     setVenue(show.venue);
     setCity(show.city);
     setTicketUrl(show.ticket_url || '');
@@ -133,6 +140,7 @@ export default function ShowsEditor() {
     setEditingId(null);
     setEventName('');
     setDate('');
+    setShowTime('');
     setVenue('');
     setCity('');
     setTicketUrl('');
@@ -147,6 +155,22 @@ export default function ShowsEditor() {
   function formatDate(dateStr: string) {
     const d = new Date(dateStr + 'T00:00:00');
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  
+  function formatTime(time: string) {
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${minutes} ${ampm}`;
+  }
+  
+  function formatDateTime(dateStr: string, timeStr?: string | null) {
+    const dateFormatted = formatDate(dateStr);
+    if (timeStr) {
+      return `${dateFormatted} - ${formatTime(timeStr)}`;
+    }
+    return dateFormatted;
   }
   
   return (
@@ -194,10 +218,32 @@ export default function ShowsEditor() {
           
           <div>
             <label className="block text-xs text-zinc-500 mb-1">Date *</label>
+            <div className="flex">
+              <button
+                type="button"
+                onClick={() => dateInputRef.current?.showPicker()}
+                className="px-3 py-2 bg-zinc-900 border border-zinc-700 border-r-0 rounded-l text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-r text-white text-sm [color-scheme:dark]"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Time</label>
             <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              type="time"
+              value={showTime}
+              onChange={(e) => setShowTime(e.target.value)}
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded text-white text-sm [color-scheme:dark]"
             />
           </div>
@@ -269,7 +315,7 @@ export default function ShowsEditor() {
                   {show.event_name && (
                     <div className="text-green-400 text-sm font-semibold mb-1">{show.event_name}</div>
                   )}
-                  <div className="text-green-500 text-sm font-medium">{formatDate(show.show_date)}</div>
+                  <div className="text-green-500 text-sm font-medium">{formatDateTime(show.show_date, show.show_time)}</div>
                   <div className="text-white font-medium truncate">{show.venue}</div>
                   <div className="text-zinc-500 text-sm">{show.city}</div>
                   {show.ticket_url && (
