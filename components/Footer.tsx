@@ -11,13 +11,15 @@ export default function Footer() {
       <div className="max-w-4xl mx-auto text-center">
         <button
           onClick={() => setLegalOpen(true)}
-          className="font-headline text-4xl tracking-wide opacity-20 mb-4 hover:opacity-40 transition-opacity cursor-pointer bg-transparent border-none"
+          className="cursor-pointer hover:opacity-80 transition-opacity text-center bg-transparent border-none"
         >
-          PHLEGM®
+          <div className="font-headline text-4xl tracking-wide opacity-20">
+            PHLEGM<span className="text-[0.6em]">®</span>
+          </div>
+          <div className="font-body text-zinc-700 text-xs mt-4">
+            © {new Date().getFullYear()} PHLEGM. SEATTLE UNDERGROUND.
+          </div>
         </button>
-        <p className="font-body text-zinc-700 text-xs">
-          © {new Date().getFullYear()} PHLEGM. SEATTLE UNDERGROUND.
-        </p>
       </div>
       <LegalModal isOpen={legalOpen} onClose={() => setLegalOpen(false)} />
     </footer>
