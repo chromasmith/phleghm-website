@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { HeroContent } from '@/types/database';
 import { createClient } from '@supabase/supabase-js';
+import { useParallax } from '@/hooks/useParallax';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -46,6 +47,9 @@ export default function HeroSection({ content }: HeroSectionProps) {
   const [splatterGlitch, setSplatterGlitch] = useState(false);
   const [heroUrls, setHeroUrls] = useState(FALLBACK_HERO_URLS);
   const jitterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Desktop-only parallax effect
+  const parallaxOffset = useParallax(0.3);
 
   // Fetch hero video URLs from site_settings
   useEffect(() => {
@@ -281,8 +285,15 @@ export default function HeroSection({ content }: HeroSectionProps) {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" style={{ zIndex: 2 }} />
       
-      {/* Content */}
-      <div className="relative text-center px-4" style={{ zIndex: 10 }}>
+      {/* Content with parallax transform (desktop only) */}
+      <div 
+        className="relative text-center px-4" 
+        style={{ 
+          zIndex: 10,
+          transform: `translateY(${parallaxOffset}px)`,
+          willChange: 'transform'
+        }}
+      >
         
         {/* Title container with distress effects */}
         <div className="relative inline-block mb-6">
