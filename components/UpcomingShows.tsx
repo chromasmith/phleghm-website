@@ -34,35 +34,35 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
             return (
               <div
                 key={show.id}
-                className="group grid grid-cols-[1fr_auto] md:flex md:flex-row md:items-center md:justify-between p-5 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30 transition-all gap-4"
+                className="group grid grid-cols-[1fr_auto] grid-rows-[auto_1fr_auto] md:grid-rows-none md:flex md:flex-row md:items-center md:justify-between p-5 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30 transition-all gap-x-4 gap-y-2"
               >
-                {/* Mobile: Event Name - Top Right (order-first on mobile, appears in right column) */}
+                {/* Mobile: Event Name - Top Right, LARGE, spans rows 1-2 */}
                 {/* Desktop: Moves to Column 3 position */}
                 {show.event_name && (
                   <div className="col-start-2 row-start-1 row-span-2 self-start justify-self-end md:order-3 md:flex-1 md:self-auto md:justify-self-auto">
-                    <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left">
+                    <h3 className="font-headline text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-bold tracking-wider text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left leading-tight">
                       {show.event_name}
                     </h3>
                   </div>
                 )}
                 
-                {/* Mobile: Left column stacked info */}
+                {/* Mobile: Left column - Date & Time (row 1) */}
                 {/* Desktop: Column 1 - Date & Time */}
                 <div className="col-start-1 row-start-1 md:order-1 md:w-24 md:shrink-0">
-                  <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-wider block">
+                  <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-widest block">
                     {monthDay}
                   </span>
                   {timeDisplay && (
-                    <span className="font-body text-zinc-500 text-xs tracking-wide">
+                    <span className="font-body text-zinc-500 text-xs tracking-wider">
                       {timeDisplay}
                     </span>
                   )}
                 </div>
                 
-                {/* Mobile: Venue & City below Date/Time on left */}
+                {/* Mobile: Venue & City - Bottom Left (row 3, same as ticket button) */}
                 {/* Desktop: Column 2 */}
-                <div className="col-start-1 row-start-2 md:order-2 md:w-44 md:shrink-0">
-                  <h3 className="font-headline text-lg sm:text-xl md:text-2xl tracking-wide text-white group-hover:text-[#00ff41] transition-colors">
+                <div className="col-start-1 row-start-3 self-end md:order-2 md:w-44 md:shrink-0 md:self-auto">
+                  <h3 className="font-headline text-lg sm:text-xl md:text-2xl tracking-wider text-white group-hover:text-[#00ff41] transition-colors">
                     {show.venue}
                   </h3>
                   <p className="font-body text-zinc-500 text-sm">
@@ -70,7 +70,7 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                   </p>
                 </div>
                 
-                {/* Mobile: Ticket Button - Bottom Right */}
+                {/* Mobile: Ticket Button - Bottom Right (row 3) */}
                 {/* Desktop: Column 4 */}
                 <div className="col-start-2 row-start-3 self-end justify-self-end md:order-4 md:self-auto md:justify-self-auto md:shrink-0">
                   {show.ticket_url ? (
