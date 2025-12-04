@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { useScrollReveal } from '@/hooks/useParallax';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,8 +21,6 @@ interface BannerData {
 export default function AnnouncementBanner() {
   const [banner, setBanner] = useState<BannerData | null>(null);
   const [loading, setLoading] = useState(true);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { isVisible } = useScrollReveal(sectionRef);
 
   useEffect(() => {
     async function fetchBanner() {
@@ -50,10 +47,7 @@ export default function AnnouncementBanner() {
   if (loading || !banner || !banner.enabled) return null;
 
   return (
-    <div 
-      ref={sectionRef}
-      className={`w-full bg-zinc-900 border-y border-zinc-800 scroll-reveal ${isVisible ? 'visible' : ''}`}
-    >
+    <div className="w-full bg-zinc-900 border-y border-zinc-800">
       <div className="max-w-7xl mx-auto">
         {/* Banner with optional media */}
         <div className="flex flex-col md:flex-row items-center">
