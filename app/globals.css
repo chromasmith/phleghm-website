@@ -17,7 +17,7 @@ body {
 /* Headline font class - generous letter-spacing for Impact font */
 .font-headline {
   font-family: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
 }
 
 /* Body/label font class */
