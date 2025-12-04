@@ -7,6 +7,7 @@ import HeroVideoEditor from './HeroVideoEditor';
 import ContactEditor from './ContactEditor';
 import BioEditor from './BioEditor';
 import ShowsEditor from './ShowsEditor';
+import StatsEditor from './StatsEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { id: 'bio', label: 'Bio' },
   { id: 'contact', label: 'Contact' },
   { id: 'banner', label: 'Banner' },
+  { id: 'stats', label: 'Stats' },
 ];
 
 export default function AdminLayout({ onLogout }: AdminLayoutProps) {
@@ -71,6 +73,7 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
             {activeSection === 'banner' && <BannerEditor />}
             {activeSection === 'contact' && <ContactEditor />}
             {activeSection === 'bio' && <BioEditor />}
+            {activeSection === 'stats' && <StatsEditor />}
           </div>
         </div>
       </main>
