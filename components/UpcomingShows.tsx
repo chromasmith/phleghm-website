@@ -37,9 +37,9 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30 transition-all"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-4 sm:mb-0 flex-1">
-                  {/* Date & Time Column */}
+                  {/* Column 1: Date & Time */}
                   <div className="w-24 shrink-0">
-                    <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl block">
+                    <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold block">
                       {monthDay}
                     </span>
                     {timeDisplay && (
@@ -49,27 +49,27 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                     )}
                   </div>
                   
-                  {/* Event Name Column */}
+                  {/* Column 2: Venue & City */}
+                  <div className="sm:w-44 shrink-0">
+                    <h3 className="font-headline text-xl sm:text-2xl text-white group-hover:text-[#00ff41] transition-colors">
+                      {show.venue}
+                    </h3>
+                    <p className="font-body text-zinc-500 text-sm">
+                      {show.city}
+                    </p>
+                  </div>
+                  
+                  {/* Column 3: Event Name (LARGEST) */}
                   {show.event_name && (
-                    <div className="sm:w-48 shrink-0">
-                      <h3 className="font-headline text-lg sm:text-xl text-white group-hover:text-[#00ff41] transition-colors">
+                    <div className="flex-1">
+                      <h3 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold text-[#00ff41] group-hover:text-white transition-colors">
                         {show.event_name}
                       </h3>
                     </div>
                   )}
-                  
-                  {/* Venue & City Column */}
-                  <div className="flex-1">
-                    <h3 className="font-headline text-xl sm:text-2xl text-white group-hover:text-[#00ff41] transition-colors">
-                      {show.venue}
-                    </h3>
-                    <p className="font-body text-zinc-600 text-sm">
-                      {show.city}
-                    </p>
-                  </div>
                 </div>
                 
-                {/* Ticket Button Column */}
+                {/* Column 4: Ticket Button */}
                 {show.ticket_url ? (
                   <a
                     href={show.ticket_url}
