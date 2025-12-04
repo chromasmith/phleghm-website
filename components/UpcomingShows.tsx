@@ -34,56 +34,60 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
             return (
               <div
                 key={show.id}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30 transition-all"
+                className="group grid grid-cols-[1fr_auto] md:flex md:flex-row md:items-center md:justify-between p-5 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30 transition-all gap-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-4 sm:mb-0 flex-1">
-                  {/* Column 1: Date & Time */}
-                  <div className="w-24 shrink-0">
-                    <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold block">
-                      {monthDay}
-                    </span>
-                    {timeDisplay && (
-                      <span className="font-body text-zinc-500 text-xs tracking-wide">
-                        {timeDisplay}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Column 2: Venue & City */}
-                  <div className="sm:w-44 shrink-0">
-                    <h3 className="font-headline text-xl sm:text-2xl text-white group-hover:text-[#00ff41] transition-colors">
-                      {show.venue}
+                {/* Mobile: Event Name - Top Right (order-first on mobile, appears in right column) */}
+                {/* Desktop: Moves to Column 3 position */}
+                {show.event_name && (
+                  <div className="col-start-2 row-start-1 row-span-2 self-start justify-self-end md:order-3 md:flex-1 md:self-auto md:justify-self-auto">
+                    <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left">
+                      {show.event_name}
                     </h3>
-                    <p className="font-body text-zinc-500 text-sm">
-                      {show.city}
-                    </p>
                   </div>
-                  
-                  {/* Column 3: Event Name (LARGEST) */}
-                  {show.event_name && (
-                    <div className="flex-1">
-                      <h3 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold text-[#00ff41] group-hover:text-white transition-colors">
-                        {show.event_name}
-                      </h3>
-                    </div>
+                )}
+                
+                {/* Mobile: Left column stacked info */}
+                {/* Desktop: Column 1 - Date & Time */}
+                <div className="col-start-1 row-start-1 md:order-1 md:w-24 md:shrink-0">
+                  <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-wider block">
+                    {monthDay}
+                  </span>
+                  {timeDisplay && (
+                    <span className="font-body text-zinc-500 text-xs tracking-wide">
+                      {timeDisplay}
+                    </span>
                   )}
                 </div>
                 
-                {/* Column 4: Ticket Button */}
-                {show.ticket_url ? (
-                  <a
-                    href={show.ticket_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-body border border-zinc-700 px-6 py-3 text-xs tracking-widest uppercase hover:border-[#00ff41] hover:text-[#00ff41] transition-all self-start sm:self-auto shrink-0"
-                  >
-                    Get Tickets →
-                  </a>
-                ) : (
-                  <span className="font-body px-6 py-3 text-zinc-600 text-xs tracking-widest uppercase self-start sm:self-auto shrink-0">
-                    Free
-                  </span>
-                )}
+                {/* Mobile: Venue & City below Date/Time on left */}
+                {/* Desktop: Column 2 */}
+                <div className="col-start-1 row-start-2 md:order-2 md:w-44 md:shrink-0">
+                  <h3 className="font-headline text-lg sm:text-xl md:text-2xl tracking-wide text-white group-hover:text-[#00ff41] transition-colors">
+                    {show.venue}
+                  </h3>
+                  <p className="font-body text-zinc-500 text-sm">
+                    {show.city}
+                  </p>
+                </div>
+                
+                {/* Mobile: Ticket Button - Bottom Right */}
+                {/* Desktop: Column 4 */}
+                <div className="col-start-2 row-start-3 self-end justify-self-end md:order-4 md:self-auto md:justify-self-auto md:shrink-0">
+                  {show.ticket_url ? (
+                    <a
+                      href={show.ticket_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-body border border-zinc-700 px-6 py-3 text-xs tracking-widest uppercase hover:border-[#00ff41] hover:text-[#00ff41] transition-all inline-block"
+                    >
+                      Get Tickets →
+                    </a>
+                  ) : (
+                    <span className="font-body px-6 py-3 text-zinc-600 text-xs tracking-widest uppercase inline-block">
+                      Free
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
