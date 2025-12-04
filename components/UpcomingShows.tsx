@@ -40,7 +40,10 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 {/* Desktop: Moves to Column 3 position */}
                 {show.event_name && (
                   <div className="col-start-2 row-start-1 row-span-2 self-start justify-self-end md:order-3 md:flex-1 md:self-auto md:justify-self-auto">
-                    <h3 className="font-headline text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-bold tracking-wider text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left leading-tight">
+                    <h3 
+                      className="font-headline text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-bold tracking-wider text-[#00ff41] group-hover:text-white transition-colors text-right md:text-left leading-tight"
+                      style={{ letterSpacing: '0.05em' }}
+                    >
                       {show.event_name}
                     </h3>
                   </div>
@@ -49,7 +52,10 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 {/* Mobile: Left column - Date & Time (row 1) */}
                 {/* Desktop: Column 1 - Date & Time */}
                 <div className="col-start-1 row-start-1 md:order-1 md:w-24 md:shrink-0">
-                  <span className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-widest block">
+                  <span 
+                    className="font-headline text-[#00ff41] text-2xl sm:text-3xl font-bold tracking-widest block"
+                    style={{ letterSpacing: '0.05em' }}
+                  >
                     {monthDay}
                   </span>
                   {timeDisplay && (
@@ -62,7 +68,10 @@ export default function UpcomingShows({ shows }: UpcomingShowsProps) {
                 {/* Mobile: Venue & City - Bottom Left (row 3, same as ticket button) */}
                 {/* Desktop: Column 2 */}
                 <div className="col-start-1 row-start-3 self-end md:order-2 md:w-44 md:shrink-0 md:self-auto">
-                  <h3 className="font-headline text-lg sm:text-xl md:text-2xl tracking-wider text-white group-hover:text-[#00ff41] transition-colors">
+                  <h3 
+                    className="font-headline text-lg sm:text-xl md:text-2xl tracking-wider text-white group-hover:text-[#00ff41] transition-colors"
+                    style={{ letterSpacing: '0.05em' }}
+                  >
                     {show.venue}
                   </h3>
                   <p className="font-body text-zinc-500 text-sm">
