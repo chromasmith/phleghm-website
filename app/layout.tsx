@@ -13,6 +13,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          defer
+          data-domain="phlegm.music"
+          src="https://plausible.io/js/script.js"
+        />
+      </head>
       <body>{children}</body>
     </html>
   )

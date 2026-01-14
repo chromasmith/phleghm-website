@@ -1,3 +1,5 @@
+'use client';
+
 const socialLinks = [
   { name: 'TikTok', href: 'https://www.tiktok.com/@phlegmssg', icon: TikTokIcon, primary: true },
   { name: 'YouTube', href: 'https://www.youtube.com/@PHLEGMO', icon: YouTubeIcon, primary: false },
@@ -5,6 +7,12 @@ const socialLinks = [
   { name: 'Spotify', href: 'https://open.spotify.com/artist/3brB4yhi4ZJtxQkbZX0wkk', icon: SpotifyIcon, primary: false },
   { name: 'SoundCloud', href: 'https://soundcloud.com/phlegmo', icon: SoundCloudIcon, primary: false },
 ];
+
+function trackSocialClick(platform: string) {
+  if (typeof window !== 'undefined' && (window as unknown as { plausible?: (event: string, options: { props: { platform: string } }) => void }).plausible) {
+    (window as unknown as { plausible: (event: string, options: { props: { platform: string } }) => void }).plausible('Social Click', { props: { platform } });
+  }
+}
 
 export default function SocialLinks() {
   return (
@@ -17,6 +25,7 @@ export default function SocialLinks() {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackSocialClick(link.name)}
               className="group flex flex-col items-center gap-2"
             >
               <div className={`w-12 h-12 md:w-14 md:h-14 bg-zinc-900 flex items-center justify-center group-hover:bg-[#00ff41] transition-colors ${

@@ -474,6 +474,11 @@ export default function HeroSection({ content }: HeroSectionProps) {
           href="https://www.tiktok.com/@phlegmssg"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            if (typeof window !== 'undefined' && (window as unknown as { plausible?: (event: string, options: { props: { platform: string } }) => void }).plausible) {
+              (window as unknown as { plausible: (event: string, options: { props: { platform: string } }) => void }).plausible('Social Click', { props: { platform: 'TikTok Hero' } });
+            }
+          }}
           className="font-headline inline-flex items-center gap-4 mt-12 px-10 py-4 bg-[#00ff41] text-black font-bold text-sm uppercase hover:bg-white transition-all duration-300"
           style={{ letterSpacing: '0.15em' }}
         >
