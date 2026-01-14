@@ -14,10 +14,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Privacy-friendly analytics by Plausible */}
+        <script async src="https://plausible.io/js/pa-GL0V5O7E6RPgtfCnIQVKe.js" />
         <script
-          defer
-          data-domain="phlegm.music"
-          src="https://plausible.io/js/script.js"
+          dangerouslySetInnerHTML={{
+            __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
+          }}
         />
       </head>
       <body>{children}</body>
