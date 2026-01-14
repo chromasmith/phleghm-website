@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import BioModal from './BioModal';
+import AboutModal from './AboutModal';
 import ContactModal from './ContactModal';
 
 export default function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [isBioOpen, setIsBioOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const menuItems = [
-    { label: 'BIO', action: 'bio' },
+    { label: 'ABOUT', action: 'about' },
     { label: 'CONTACT', action: 'contact' },
   ];
 
@@ -70,8 +72,8 @@ export default function HamburgerMenu() {
             <button
               key={item.action}
               onClick={() => {
-                if (item.action === 'bio') {
-                  setIsBioOpen(true);
+                if (item.action === 'about') {
+                  setIsAboutOpen(true);
                 } else if (item.action === 'contact') {
                   setIsContactOpen(true);
                 }
@@ -86,6 +88,7 @@ export default function HamburgerMenu() {
       </div>
 
       <BioModal isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} />
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </>
   );

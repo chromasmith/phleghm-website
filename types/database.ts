@@ -28,6 +28,28 @@ export interface PastShow {
   updated_at: string;
 }
 
+export interface LegalContent {
+  id: string;
+  title: string;
+  trademark_text: string;
+  trademark_link_text: string;
+  trademark_url: string;
+  copyright_text: string;
+  rights_text: string;
+  updated_at: string;
+}
+
+export interface AboutContent {
+  id: string;
+  hero_video_url: string | null;
+  hero_video_width: number;
+  hero_video_height: number;
+  use_legal_content: boolean;
+  title: string;
+  about_text: string;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {

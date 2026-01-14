@@ -8,6 +8,8 @@ import ContactEditor from './ContactEditor';
 import BioEditor from './BioEditor';
 import ShowsEditor from './ShowsEditor';
 import StatsEditor from './StatsEditor';
+import AboutEditor from './AboutEditor';
+import LegalEditor from './LegalEditor';
 
 interface AdminLayoutProps {
   onLogout: () => void;
@@ -18,8 +20,10 @@ const NAV_ITEMS = [
   { id: 'taglines', label: 'Taglines' },
   { id: 'shows', label: 'Shows' },
   { id: 'bio', label: 'Bio' },
+  { id: 'about', label: 'About' },
   { id: 'contact', label: 'Contact' },
   { id: 'banner', label: 'Banner' },
+  { id: 'legal', label: 'Legal / Footer' },
   { id: 'stats', label: 'Stats' },
 ];
 
@@ -73,6 +77,8 @@ export default function AdminLayout({ onLogout }: AdminLayoutProps) {
             {activeSection === 'banner' && <BannerEditor />}
             {activeSection === 'contact' && <ContactEditor />}
             {activeSection === 'bio' && <BioEditor />}
+            {activeSection === 'about' && <AboutEditor />}
+            {activeSection === 'legal' && <LegalEditor />}
             {activeSection === 'stats' && <StatsEditor />}
           </div>
         </div>
